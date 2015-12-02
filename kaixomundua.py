@@ -20,23 +20,33 @@ import webapp2
 import os
 import jinja2
 
+from google.appengine.ext import vendor
+
+vendor.add('lib')
+
+from webapp2_extras import i18n
+
+
+
 JINJA_ENVIRONMENT = jinja2.Environment(
     loader=jinja2.FileSystemLoader(os.path.dirname(__file__)),
-    extensions=['jinja2.ext.autoescape'],
+    extensions=['jinja2.ext.autoescape', 'jinja2.ext.i18n'],
     autoescape=True)
 
+JINJA_ENVIRONMENT.install_gettext_translations(i18n)
 
 class Register(webapp2.RequestHandler):
     def get(self):
+        i18n.get_i18n().set_locale('eu_ES')
         template = JINJA_ENVIRONMENT.get_template('static/templates/register.html')
         self.response.write(template.render())
 
 
 class MainEuskera(webapp2.RequestHandler):
     def get(self):
-        preamble(self)
-        self.response.out.write("<div id='message'>Hola mundo!</div>")
-        info("Ver en otros idiomas:", self)
+        i18n.get_i18n().set_locale('eu_ES')
+        template = JINJA_ENVIRONMENT.get_template('static/templates/welcome.html')
+        self.response.write(template.render())
 
 
 class MainSpanish(webapp2.RequestHandler):
