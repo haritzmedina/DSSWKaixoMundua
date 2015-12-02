@@ -16,11 +16,27 @@
 #
 import webapp2
 
+# Jinja templates
+import os
+import jinja2
+
+JINJA_ENVIRONMENT = jinja2.Environment(
+    loader=jinja2.FileSystemLoader(os.path.dirname(__file__)),
+    extensions=['jinja2.ext.autoescape'],
+    autoescape=True)
+
+
+class Register(webapp2.RequestHandler):
+    def get(self):
+        template = JINJA_ENVIRONMENT.get_template('static/templates/register.html')
+        self.response.write(template.render())
+
+
 class MainEuskera(webapp2.RequestHandler):
     def get(self):
         preamble(self)
-        self.response.out.write("<div id='message'>Kaixo Mundua!</div>")
-        info("Ikusi beste lenguaietan:", self)
+        self.response.out.write("<div id='message'>Hola mundo!</div>")
+        info("Ver en otros idiomas:", self)
 
 
 class MainSpanish(webapp2.RequestHandler):
@@ -51,11 +67,13 @@ def preamble(self):
         "<link rel='shortcut icon' href='images/h.png' type='image/x-icon'/>"
         "</head><body>")
 
+
 def foot(self):
     self.response.out.write("</body></html>")
 
 app = webapp2.WSGIApplication([
     ('/', MainEuskera),
+    ('/register', Register),
     ('/agurtu', MainEuskera),
     ('/saludo', MainSpanish),
     ('/greeting', MainEnglish)
