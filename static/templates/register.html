@@ -1,13 +1,18 @@
 {% extends "static/templates/base.html" %}
 {% block title %}Register{% endblock %}
+{% block headParams %}
+<link rel="stylesheet" type="text/css" href="stylesheet/register.css"/>
+<script type="text/javascript" src="js/register.js"></script>
+<meta id="trans" data-password-missmatch="{% trans %}PasswordMissmatch{% endtrans %}"/>
+{% endblock %}
 {% block content %}
 <div>
-    <form method="post" action="/register">
-        <label for="username">Username:</label><input type="text" id="username"/>
-        <label for="username">Password:</label><input type="password" id="password1"/>
-        <label for="username">Password again:</label><input type="password" id="password2"/>
-        <label for="username">Email:</label><input type="email" id="email"/>
-        <input type="button" id="send"/>
+    <form id="register" method="post" action="/register">
+        <div><input type="text" id="username" required="required" placeholder="{% trans %}Username{% endtrans %}" class="formBox"/></div>
+        <div><input type="password" id="password1" min="8" required="required"  placeholder="{% trans %}Password{% endtrans %}" class="formBox"/></div>
+        <div><input type="password" id="password2" min="8" required="required" placeholder="{% trans %}PasswordRepeat{% endtrans %}" class="formBox"/></div>
+        <div><input type="email" id="email" required="required" placeholder="{% trans %}Email{% endtrans %}" class="formBox"/></div>
+        <div><input type="submit" id="submit" required="required" value="{% trans %}Register{% endtrans %}"/></div>
     </form>
 </div>
 {% endblock %}

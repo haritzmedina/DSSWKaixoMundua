@@ -37,7 +37,7 @@ JINJA_ENVIRONMENT.install_gettext_translations(i18n)
 
 class Register(webapp2.RequestHandler):
     def get(self):
-        i18n.get_i18n().set_locale('eu_ES')
+        i18n.get_i18n().set_locale('es_ES')
         template = JINJA_ENVIRONMENT.get_template('static/templates/register.html')
         self.response.write(template.render())
 
