@@ -6,12 +6,25 @@
     {% block headParams %}{% endblock %}
     <link rel="stylesheet" type="text/css" href="stylesheet/default.css"/>
     <script type="text/javascript" src="js/default.js"></script>
+    <link rel="icon" type="image/png" href="images/h.png">
     {% endblock %}
 </head>
 <body>
 <header>
-
+    <div id="head">
+        <div id="headerTitle">Kaixo Mundua Web Page</div>
+        <div id="languages">
+            <div id="langEn" class="language"><a href="?language=en_EN">En</a></div>
+            <div id="langEs" class="language"><a href="?language=es_ES">Es</a></div>
+            <div id="langEu" class="language"><a href="?language=eu_ES">Eu</a></div>
+        </div>
+    </div>
 </header>
+<div id="menu">
+    <div id="indexTab" class="tab" data-active="{% block welcomeActive %}{% endblock %}"><a href="/">{% trans %}Index{% endtrans %}</a></div>
+    <div id="registerTab" class="tab" data-active="{% block registerActive %}{% endblock %}"><a href="/register">{% trans %}Register{% endtrans %}</a></div>
+    <div id="showUsersTab" class="tab" data-active="{% block usersActive %}{% endblock %}"><a href="/users">{% trans %}Users{% endtrans %}</a></div>
+</div>
 <section id="content">
     {% block content %}{% endblock %}
 </section>

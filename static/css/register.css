@@ -5,9 +5,17 @@
     font-size: large;
     float:none;
     margin-top: 15px;
+    text-align: center;
 }
 
 #submit{
     background-color: rgba(255,255,255,1);
+    width: 250px;
+    height: 50px;
+    margin-top: 15px;
+    font-size: large;
+}
 
+#register{
+    margin: auto;
 }

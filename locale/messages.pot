@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2015-12-02 22:41+0100\n"
+"POT-Creation-Date: 2015-12-03 16:41+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,31 +17,36 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.1.1\n"
 
-#: static/templates/register.html:5
-msgid "PasswordMissmatch"
+#: static/templates/base.html:20
+msgid "Index"
 msgstr ""
 
-#: static/templates/register.html:10
-msgid "Username"
-msgstr ""
-
-#: static/templates/register.html:11
-msgid "Password"
-msgstr ""
-
-#: static/templates/register.html:12
-msgid "PasswordRepeat"
-msgstr ""
-
-#: static/templates/register.html:13
-msgid "Email"
-msgstr ""
-
-#: static/templates/register.html:14
+#: static/templates/base.html:21 static/templates/register.html:15
 msgid "Register"
 msgstr ""
 
-#: static/templates/welcome.html:2 static/templates/welcome.html:4
+#: static/templates/base.html:22 static/templates/welcome.html:2
+#: static/templates/welcome.html:4
 msgid "HelloWorld"
+msgstr ""
+
+#: static/templates/register.html:6
+msgid "PasswordMissmatch"
+msgstr ""
+
+#: static/templates/register.html:11
+msgid "Username"
+msgstr ""
+
+#: static/templates/register.html:12
+msgid "Password"
+msgstr ""
+
+#: static/templates/register.html:13
+msgid "PasswordRepeat"
+msgstr ""
+
+#: static/templates/register.html:14
+msgid "Email"
 msgstr ""
 

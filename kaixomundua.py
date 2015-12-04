@@ -15,18 +15,13 @@
 # limitations under the License.
 #
 import webapp2
-
 # Jinja templates
 import os
 import jinja2
-
 from google.appengine.ext import vendor
 
 vendor.add('lib')
-
 from webapp2_extras import i18n
-
-
 
 JINJA_ENVIRONMENT = jinja2.Environment(
     loader=jinja2.FileSystemLoader(os.path.dirname(__file__)),
@@ -35,56 +30,37 @@ JINJA_ENVIRONMENT = jinja2.Environment(
 
 JINJA_ENVIRONMENT.install_gettext_translations(i18n)
 
+
 class Register(webapp2.RequestHandler):
     def get(self):
-        i18n.get_i18n().set_locale('es_ES')
+        Language().setLanguage(self.request.get('language'))
         template = JINJA_ENVIRONMENT.get_template('static/templates/register.html')
         self.response.write(template.render())
 
+    def post(self):
+        # TODO check variables with python RE
+        self.response.write("Not working yet")
 
-class MainEuskera(webapp2.RequestHandler):
+
+class Welcome(webapp2.RequestHandler):
     def get(self):
-        i18n.get_i18n().set_locale('eu_ES')
+        Language().setLanguage(self.request.get('language'))
         template = JINJA_ENVIRONMENT.get_template('static/templates/welcome.html')
         self.response.write(template.render())
 
 
-class MainSpanish(webapp2.RequestHandler):
-    def get(self):
-        preamble(self)
-        self.response.out.write("<div id='message'>Hola mundo!</div>")
-        info("Ver en otros idiomas:", self)
+class Language:
+    def __init__(self):
+        pass
 
+    def setLanguage(self, lang):
+        i18n.get_i18n().set_locale(lang)
 
-class MainEnglish(webapp2.RequestHandler):
-    def get(self):
-        preamble(self)
-        self.response.out.write("<div id='message'>Hello world!</div>")
-        info("See in other languages:", self)
-
-
-def info(message, self):
-    self.response.out.write(
-        "<br/>"+message+"<br/>"
-        "<a href='/saludo'>Castellano</a><br/><a href='/greeting'>English</a><br/><a href='/agurtu'>Euskara</a>")
-
-
-def preamble(self):
-    self.response.headers['Content-Type'] = 'text/html'
-    self.response.out.write(
-        "<html><head>"
-        "<link rel='stylesheet' href='stylesheet/default.css'>"
-        "<link rel='shortcut icon' href='images/h.png' type='image/x-icon'/>"
-        "</head><body>")
-
-
-def foot(self):
-    self.response.out.write("</body></html>")
 
 app = webapp2.WSGIApplication([
-    ('/', MainEuskera),
+    ('/', Welcome),
     ('/register', Register),
-    ('/agurtu', MainEuskera),
-    ('/saludo', MainSpanish),
-    ('/greeting', MainEnglish)
+    ('/agurtu', Welcome),
+    ('/saludo', Welcome),
+    ('/greeting', Welcome)
 ], debug=True)
