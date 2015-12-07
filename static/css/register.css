@@ -19,3 +19,13 @@
 #register{
     margin: auto;
 }
+
+#errorMessage{
+    color: rgba(230,100,100,1);
+    font-size: large;
+    background-color: rgba(50,50,50,0.8);
+    min-width: 150px;
+    width: inherit;
+    padding: 15px;
+    border-radius: 7px;
+}

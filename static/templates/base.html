@@ -21,9 +21,9 @@
     </div>
 </header>
 <div id="menu">
-    <div id="indexTab" class="tab" data-active="{% block welcomeActive %}{% endblock %}"><a href="/">{% trans %}Index{% endtrans %}</a></div>
-    <div id="registerTab" class="tab" data-active="{% block registerActive %}{% endblock %}"><a href="/register">{% trans %}Register{% endtrans %}</a></div>
-    <div id="showUsersTab" class="tab" data-active="{% block usersActive %}{% endblock %}"><a href="/users">{% trans %}Users{% endtrans %}</a></div>
+    <a href="/"><div id="indexTab" class="tab" data-active="{% block welcomeActive %}{% endblock %}">{% trans %}Index{% endtrans %}</div></a>
+    <a href="/register"><div id="registerTab" class="tab" data-active="{% block registerActive %}{% endblock %}">{% trans %}Register{% endtrans %}</div></a>
+    <a href="/users"><div id="showUsersTab" class="tab" data-active="{% block usersActive %}{% endblock %}">{% trans %}Users{% endtrans %}</div></a>
 </div>
 <section id="content">
     {% block content %}{% endblock %}

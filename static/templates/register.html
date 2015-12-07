@@ -7,6 +7,9 @@
 {% endblock %}
 {% block content %}
 <div>
+    {% if error %}
+    <div id="errorMessage">{% trans %}Error{% endtrans %}: {{ error }}</div>
+    {% endif %}
     <form id="register" method="post" action="/register">
         <div><input type="text" id="username" name="username" required="required" placeholder="{% trans %}Username{% endtrans %}" class="formBox"/></div>
         <div><input type="password" id="password1" name="password1" pattern=".{6,}" required="required"  placeholder="{% trans %}Password{% endtrans %}" class="formBox"/></div>
@@ -16,3 +19,4 @@
     </form>
 </div>
 {% endblock %}
+{% block registerActive %}true{% endblock %}
