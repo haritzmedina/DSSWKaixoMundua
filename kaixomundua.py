@@ -15,48 +15,126 @@
 # limitations under the License.
 #
 import webapp2
+# Jinja templates
+import os
+import jinja2
+# Regular expression
+import re
+from google.appengine.ext import vendor
 
-class MainEuskera(webapp2.RequestHandler):
+# Add language compatibility
+vendor.add('lib')
+from webapp2_extras import i18n
+from webapp2_extras.i18n import gettext as _
+# Add database file
+import database
+
+JINJA_ENVIRONMENT = jinja2.Environment(
+    loader=jinja2.FileSystemLoader(os.path.dirname(__file__)),
+    extensions=['jinja2.ext.autoescape', 'jinja2.ext.i18n'],
+    autoescape=True)
+
+JINJA_ENVIRONMENT.install_gettext_translations(i18n)
+
+
+# Register page backend
+class Register(webapp2.RequestHandler):
     def get(self):
-        preamble(self)
-        self.response.out.write("<div id='message'>Kaixo Mundua!</div>")
-        info("Ikusi beste lenguaietan:", self)
+        Language.language(self)
+        template = JINJA_ENVIRONMENT.get_template('static/templates/register.html')
+        self.response.write(template.render())
+
+    def post(self):
+        Language.language(self)
+        # Retrieve request data
+        username = self.request.get('username')
+        password1 = self.request.get('password1')
+        password2 = self.request.get('password2')
+        email = self.request.get('email')
+
+        # Load success and fail templates
+        registerTemplate = JINJA_ENVIRONMENT.get_template('static/templates/register.html')
+        registeredTemplate = JINJA_ENVIRONMENT.get_template('static/templates/registered.html')
+
+        # Check email is well formed
+        if not re.match(r"[^@]+@[^@]+\.[^@]+", email):
+            self.response.write(registerTemplate.render(error=_("Bad email.")))
+            return None
+        # Check passwords min size is 6
+        if len(password1) < 6:
+            self.response.write(registerTemplate.render(error=_("Password min length not reached.")))
+            return None
+        # Check passwords match
+        if password1 != password2:
+            self.response.write(registerTemplate.render(error=_("Passwords do not match.")))
+            return None
+        # Username not empty
+        if len(username) < 1:
+            self.response.write(registerTemplate.render(error=_("Empty username.")))
+        # Check user exists
+        user = database.UserManager.select_by_username(username)
+        if user is not None:
+            self.response.write(registerTemplate.render(error=_("Username exists")))
+            return None
+        # Check email exists
+        user = database.UserManager.select_by_email(email)
+        if user is not None:
+            self.response.write(registerTemplate.render(error=_("Email exists")))
+            return None
+
+        # Save in DB
+        if database.UserManager.create(username, password1, email, None):
+            self.response.write(registeredTemplate.render(username=username))
 
 
-class MainSpanish(webapp2.RequestHandler):
+# Welcome page backend
+class Welcome(webapp2.RequestHandler):
     def get(self):
-        preamble(self)
-        self.response.out.write("<div id='message'>Hola mundo!</div>")
-        info("Ver en otros idiomas:", self)
+        Language.language(self)
+        template = JINJA_ENVIRONMENT.get_template('static/templates/welcome.html')
+        self.response.write(template.render())
 
 
-class MainEnglish(webapp2.RequestHandler):
+# Users manage handler
+class UsersPage(webapp2.RequestHandler):
     def get(self):
-        preamble(self)
-        self.response.out.write("<div id='message'>Hello world!</div>")
-        info("See in other languages:", self)
+        Language.language(self)
+        # Retrieve users
+        users = database.UserManager.select()
+        # Render template
+        template = JINJA_ENVIRONMENT.get_template('static/templates/users.html')
+        self.response.write(template.render(users=users))
 
 
-def info(message, self):
-    self.response.out.write(
-        "<br/>"+message+"<br/>"
-        "<a href='/saludo'>Castellano</a><br/><a href='/greeting'>English</a><br/><a href='/agurtu'>Euskara</a>")
+# i18n language handler
+class Language:
+    def __init__(self):
+        pass
+
+    @staticmethod
+    def setlanguage(lang):
+        i18n.get_i18n().set_locale(lang)
+
+    @staticmethod
+    def language(http):
+        # Language change petition
+        newLang = http.request.get('language')
+        cookieLang = http.request.cookies.get('language')
+        currentLang = None
+        if len(newLang) > 1:
+            currentLang = newLang
+        else:
+            if cookieLang is None or len(cookieLang) < 1:
+                currentLang = 'eu_ES'
+            else:
+                currentLang = cookieLang
+        http.response.set_cookie('language', currentLang, max_age=15724800) # 26 weeks in seconds
+        Language.setlanguage(currentLang)
 
 
-def preamble(self):
-    self.response.headers['Content-Type'] = 'text/html'
-    self.response.out.write(
-        "<html><head>"
-        "<link rel='stylesheet' href='stylesheet/default.css'>"
-        "<link rel='shortcut icon' href='images/h.png' type='image/x-icon'/>"
-        "</head><body>")
-
-def foot(self):
-    self.response.out.write("</body></html>")
 
 app = webapp2.WSGIApplication([
-    ('/', MainEuskera),
-    ('/agurtu', MainEuskera),
-    ('/saludo', MainSpanish),
-    ('/greeting', MainEnglish)
+    ('/', Welcome),
+    ('/register', Register),
+    ('/users', UsersPage)
 ], debug=True)
