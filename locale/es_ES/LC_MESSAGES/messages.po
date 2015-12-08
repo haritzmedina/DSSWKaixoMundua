@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2015-12-03 16:41+0100\n"
+"POT-Creation-Date: 2015-12-08 14:10+0100\n"
 "PO-Revision-Date: 2015-12-02 16:48+0100\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: es_ES\n"
@@ -19,37 +19,92 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.1.1\n"
 
-#: static/templates/base.html:20
+#: kaixomundua.py:60
+msgid "Bad email."
+msgstr ""
+
+#: kaixomundua.py:64
+msgid "Password min length not reached."
+msgstr ""
+
+#: kaixomundua.py:68
+#, fuzzy
+msgid "Passwords do not match."
+msgstr "Las contraseñas no coinciden"
+
+#: kaixomundua.py:73
+#, fuzzy
+msgid "Username exists"
+msgstr "Usuario"
+
+#: kaixomundua.py:78
+msgid "Email exists"
+msgstr "El email está ocupado"
+
+#: static/templates/base.html:24
 msgid "Index"
 msgstr "Índice"
 
-#: static/templates/base.html:21 static/templates/register.html:15
+#: static/templates/base.html:25 static/templates/register.html:18
 msgid "Register"
 msgstr "Registrarse"
 
-#: static/templates/base.html:22 static/templates/welcome.html:2
-#: static/templates/welcome.html:4
-#, fuzzy
-msgid "HelloWorld"
-msgstr "Hola mundo"
+#: static/templates/base.html:26
+msgid "Users"
+msgstr "Usuarios"
 
-#: static/templates/register.html:6
+#: static/templates/register.html:6 static/templates/registered.html:6
 msgid "PasswordMissmatch"
 msgstr "Las contraseñas no coinciden"
 
 #: static/templates/register.html:11
+msgid "Error"
+msgstr "Error"
+
+#: static/templates/register.html:14
 msgid "Username"
 msgstr "Usuario"
 
-#: static/templates/register.html:12
+#: static/templates/register.html:15
 msgid "Password"
 msgstr "Contraseña"
 
-#: static/templates/register.html:13
+#: static/templates/register.html:16
 msgid "PasswordRepeat"
 msgstr "Repita contraseña"
 
-#: static/templates/register.html:14
+#: static/templates/register.html:17 static/templates/users.html:13
 msgid "Email"
 msgstr "Email"
+
+#: static/templates/registered.html:10
+msgid "Hello"
+msgstr "Hola"
+
+#: static/templates/registered.html:10
+msgid "Your account is created."
+msgstr "Tu cuenta ha sido creada"
+
+#: static/templates/registered.html:11
+msgid "Welcome to Kaixo Mundua!"
+msgstr "Bienvenido a Kaixo Mundua!"
+
+#: static/templates/users.html:10
+#, fuzzy
+msgid "Name"
+msgstr "Usuario"
+
+#: static/templates/users.html:16
+#, fuzzy
+msgid "Register date"
+msgstr "Registrarse"
+
+#: static/templates/users.html:19
+msgid "Photo"
+msgstr "Foto"
+
+#: static/templates/welcome.html:2 static/templates/welcome.html:4
+#, fuzzy
+msgid "HelloWorld"
+msgstr "Hola mundo"
 

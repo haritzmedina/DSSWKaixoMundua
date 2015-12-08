@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2015-12-03 16:41+0100\n"
+"POT-Creation-Date: 2015-12-08 14:10+0100\n"
 "PO-Revision-Date: 2015-12-02 16:48+0100\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: eu_ES\n"
@@ -19,37 +19,92 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.1.1\n"
 
-#: static/templates/base.html:20
+#: kaixomundua.py:60
+msgid "Bad email."
+msgstr "Email-a ez da egokia."
+
+#: kaixomundua.py:64
+msgid "Password min length not reached."
+msgstr "Pasahitsa luzeagoa izan behar da."
+
+#: kaixomundua.py:68
+#, fuzzy
+msgid "Passwords do not match."
+msgstr "Pasahitsak ez dira berdinak."
+
+#: kaixomundua.py:73
+#, fuzzy
+msgid "Username exists"
+msgstr "Erabiltzailea"
+
+#: kaixomundua.py:78
+msgid "Email exists"
+msgstr "Email-a hartuta dago"
+
+#: static/templates/base.html:24
 msgid "Index"
 msgstr "Hasiera"
 
-#: static/templates/base.html:21 static/templates/register.html:15
+#: static/templates/base.html:25 static/templates/register.html:18
 msgid "Register"
 msgstr "Erregistratu"
 
-#: static/templates/base.html:22 static/templates/welcome.html:2
-#: static/templates/welcome.html:4
-#, fuzzy
-msgid "HelloWorld"
-msgstr "Kaixo mundua"
+#: static/templates/base.html:26
+msgid "Users"
+msgstr "Erabiltzaileak"
 
-#: static/templates/register.html:6
+#: static/templates/register.html:6 static/templates/registered.html:6
 msgid "PasswordMissmatch"
 msgstr "Pasahitsak ez dira berdinak."
 
 #: static/templates/register.html:11
+msgid "Error"
+msgstr "Errorea"
+
+#: static/templates/register.html:14
 msgid "Username"
 msgstr "Erabiltzailea"
 
-#: static/templates/register.html:12
+#: static/templates/register.html:15
 msgid "Password"
 msgstr "Pasahitsa"
 
-#: static/templates/register.html:13
+#: static/templates/register.html:16
 msgid "PasswordRepeat"
 msgstr "Pasahitsa berridatzi"
 
-#: static/templates/register.html:14
+#: static/templates/register.html:17 static/templates/users.html:13
 msgid "Email"
 msgstr "Email-a"
+
+#: static/templates/registered.html:10
+msgid "Hello"
+msgstr "Kaixo"
+
+#: static/templates/registered.html:10
+msgid "Your account is created."
+msgstr "Zure kontua sortu egin da."
+
+#: static/templates/registered.html:11
+msgid "Welcome to Kaixo Mundua!"
+msgstr "Kaixo gure Kaixo Mundua web orrira!"
+
+#: static/templates/users.html:10
+#, fuzzy
+msgid "Name"
+msgstr "Erabiltzailea"
+
+#: static/templates/users.html:16
+#, fuzzy
+msgid "Register date"
+msgstr "Erregistratu"
+
+#: static/templates/users.html:19
+msgid "Photo"
+msgstr "Argazkia"
+
+#: static/templates/welcome.html:2 static/templates/welcome.html:4
+#, fuzzy
+msgid "HelloWorld"
+msgstr "Kaixo mundua"
 

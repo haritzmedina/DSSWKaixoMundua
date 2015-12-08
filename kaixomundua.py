@@ -40,7 +40,7 @@ JINJA_ENVIRONMENT.install_gettext_translations(i18n)
 # Register page backend
 class Register(webapp2.RequestHandler):
     def get(self):
-        Language.setlanguage(self.request.get('language'))
+        Language.language(self)
         template = JINJA_ENVIRONMENT.get_template('static/templates/register.html')
         self.response.write(template.render())
 
@@ -86,7 +86,7 @@ class Register(webapp2.RequestHandler):
 # Welcome page backend
 class Welcome(webapp2.RequestHandler):
     def get(self):
-        Language.setlanguage(self.request.get('language'))
+        Language.language(self)
         template = JINJA_ENVIRONMENT.get_template('static/templates/welcome.html')
         self.response.write(template.render())
 
@@ -94,10 +94,10 @@ class Welcome(webapp2.RequestHandler):
 # Users manage handler
 class UsersPage(webapp2.RequestHandler):
     def get(self):
-        Language.setlanguage(self.request.get('language'))
-        # TODO Retrieve users
+        Language.language(self)
+        # Retrieve users
         users = database.UserManager.select()
-        # TODO Render template
+        # Render template
         template = JINJA_ENVIRONMENT.get_template('static/templates/users.html')
         self.response.write(template.render(users=users))
 
@@ -110,6 +110,23 @@ class Language:
     @staticmethod
     def setlanguage(lang):
         i18n.get_i18n().set_locale(lang)
+
+    @staticmethod
+    def language(http):
+        # Language change petition
+        newLang = http.request.get('language')
+        cookieLang = http.request.cookies.get('language')
+        currentLang = None
+        if len(newLang) > 1:
+            currentLang = newLang
+        else:
+            if len(cookieLang) > 1:
+                currentLang = cookieLang
+            else:
+                currentLang = 'en_US'
+        http.response.set_cookie('language', currentLang, max_age=15724800) # 26 weeks in seconds
+        Language.setlanguage(currentLang)
+
 
 
 app = webapp2.WSGIApplication([

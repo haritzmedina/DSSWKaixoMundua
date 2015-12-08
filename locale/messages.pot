@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2015-12-03 16:41+0100\n"
+"POT-Creation-Date: 2015-12-08 14:10+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,36 +17,87 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.1.1\n"
 
-#: static/templates/base.html:20
+#: kaixomundua.py:60
+msgid "Bad email."
+msgstr ""
+
+#: kaixomundua.py:64
+msgid "Password min length not reached."
+msgstr ""
+
+#: kaixomundua.py:68
+msgid "Passwords do not match."
+msgstr ""
+
+#: kaixomundua.py:73
+msgid "Username exists"
+msgstr ""
+
+#: kaixomundua.py:78
+msgid "Email exists"
+msgstr ""
+
+#: static/templates/base.html:24
 msgid "Index"
 msgstr ""
 
-#: static/templates/base.html:21 static/templates/register.html:15
+#: static/templates/base.html:25 static/templates/register.html:18
 msgid "Register"
 msgstr ""
 
-#: static/templates/base.html:22 static/templates/welcome.html:2
-#: static/templates/welcome.html:4
-msgid "HelloWorld"
+#: static/templates/base.html:26
+msgid "Users"
 msgstr ""
 
-#: static/templates/register.html:6
+#: static/templates/register.html:6 static/templates/registered.html:6
 msgid "PasswordMissmatch"
 msgstr ""
 
 #: static/templates/register.html:11
-msgid "Username"
-msgstr ""
-
-#: static/templates/register.html:12
-msgid "Password"
-msgstr ""
-
-#: static/templates/register.html:13
-msgid "PasswordRepeat"
+msgid "Error"
 msgstr ""
 
 #: static/templates/register.html:14
+msgid "Username"
+msgstr ""
+
+#: static/templates/register.html:15
+msgid "Password"
+msgstr ""
+
+#: static/templates/register.html:16
+msgid "PasswordRepeat"
+msgstr ""
+
+#: static/templates/register.html:17 static/templates/users.html:13
 msgid "Email"
+msgstr ""
+
+#: static/templates/registered.html:10
+msgid "Hello"
+msgstr ""
+
+#: static/templates/registered.html:10
+msgid "Your account is created."
+msgstr ""
+
+#: static/templates/registered.html:11
+msgid "Welcome to Kaixo Mundua!"
+msgstr ""
+
+#: static/templates/users.html:10
+msgid "Name"
+msgstr ""
+
+#: static/templates/users.html:16
+msgid "Register date"
+msgstr ""
+
+#: static/templates/users.html:19
+msgid "Photo"
+msgstr ""
+
+#: static/templates/welcome.html:2 static/templates/welcome.html:4
+msgid "HelloWorld"
 msgstr ""
 
