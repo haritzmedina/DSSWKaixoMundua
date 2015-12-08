@@ -45,6 +45,7 @@ class Register(webapp2.RequestHandler):
         self.response.write(template.render())
 
     def post(self):
+        Language.language(self)
         # Retrieve request data
         username = self.request.get('username')
         password1 = self.request.get('password1')
@@ -67,6 +68,9 @@ class Register(webapp2.RequestHandler):
         if password1 != password2:
             self.response.write(registerTemplate.render(error=_("Passwords do not match.")))
             return None
+        # Username not empty
+        if len(username) < 1:
+            self.response.write(registerTemplate.render(error=_("Empty username.")))
         # Check user exists
         user = database.UserManager.select_by_username(username)
         if user is not None:
@@ -120,10 +124,10 @@ class Language:
         if len(newLang) > 1:
             currentLang = newLang
         else:
-            if len(cookieLang) > 1:
-                currentLang = cookieLang
+            if cookieLang is None or len(cookieLang) < 1:
+                currentLang = 'eu_ES'
             else:
-                currentLang = 'en_US'
+                currentLang = cookieLang
         http.response.set_cookie('language', currentLang, max_age=15724800) # 26 weeks in seconds
         Language.setlanguage(currentLang)
 

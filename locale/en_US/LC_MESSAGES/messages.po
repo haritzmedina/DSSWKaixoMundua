@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2015-12-08 14:10+0100\n"
+"POT-Creation-Date: 2015-12-08 15:50+0100\n"
 "PO-Revision-Date: 2015-12-02 16:46+0100\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: en_US\n"
@@ -21,7 +21,7 @@ msgstr ""
 
 #: kaixomundua.py:60
 msgid "Bad email."
-msgstr ""
+msgstr "Bad email"
 
 #: kaixomundua.py:64
 msgid "Password min length not reached."
@@ -32,12 +32,17 @@ msgstr "Password min length not reached."
 msgid "Passwords do not match."
 msgstr "Passwords don't match"
 
-#: kaixomundua.py:73
+#: kaixomundua.py:72
+#, fuzzy
+msgid "Empty username."
+msgstr "Empty username."
+
+#: kaixomundua.py:76
 #, fuzzy
 msgid "Username exists"
-msgstr "Username"
+msgstr "Username exists"
 
-#: kaixomundua.py:78
+#: kaixomundua.py:81
 msgid "Email exists"
 msgstr "Email exists"
 
@@ -97,7 +102,7 @@ msgstr "Username"
 #: static/templates/users.html:16
 #, fuzzy
 msgid "Register date"
-msgstr "Register"
+msgstr "Register date"
 
 #: static/templates/users.html:19
 msgid "Photo"

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2015-12-08 14:10+0100\n"
+"POT-Creation-Date: 2015-12-08 15:50+0100\n"
 "PO-Revision-Date: 2015-12-02 16:48+0100\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: eu_ES\n"
@@ -32,12 +32,17 @@ msgstr "Pasahitsa luzeagoa izan behar da."
 msgid "Passwords do not match."
 msgstr "Pasahitsak ez dira berdinak."
 
-#: kaixomundua.py:73
+#: kaixomundua.py:72
+#, fuzzy
+msgid "Empty username."
+msgstr "Erabiltzailea sartu behar da."
+
+#: kaixomundua.py:76
 #, fuzzy
 msgid "Username exists"
-msgstr "Erabiltzailea"
+msgstr "Erabiltzaile izena erabilita dago"
 
-#: kaixomundua.py:78
+#: kaixomundua.py:81
 msgid "Email exists"
 msgstr "Email-a hartuta dago"
 
@@ -97,7 +102,7 @@ msgstr "Erabiltzailea"
 #: static/templates/users.html:16
 #, fuzzy
 msgid "Register date"
-msgstr "Erregistratu"
+msgstr "Erregistro eguna"
 
 #: static/templates/users.html:19
 msgid "Photo"
