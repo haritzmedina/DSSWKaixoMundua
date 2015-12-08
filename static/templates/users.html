@@ -4,6 +4,29 @@
 <link rel="stylesheet" type="text/css" href="stylesheet/users.css"/>
 {% endblock %}
 {% block content %}
-
+<div id="users">
+    <div id="header">
+        <div class="headerCell cell">
+            {% trans %}Name{% endtrans %}
+        </div>
+        <div class="headerCell cell">
+            {% trans %}Email{% endtrans %}
+        </div>
+        <div class="headerCell cell">
+            {% trans %}Register date{% endtrans %}
+        </div>
+        <div class="headerCell cell">
+            {% trans %}Photo{% endtrans %}
+        </div>
+    </div>
+{% for user in users %}
+<div class="user" id="user_{{ user.key.id() }}">
+    <div class="dataCell cell">{{ user.name }}</div>
+    <div class="dataCell cell">{{ user.email }}</div>
+    <div class="dataCell cell">{{ user.date }}</div>
+    <div class="dataCell cell">{{ user.photo }}</div>
+</div>
+{% endfor %}
+</div>
 {% endblock %}
 {% block usersActive %}true{% endblock %}

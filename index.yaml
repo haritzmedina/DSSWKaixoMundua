@@ -27,3 +27,9 @@ indexes:
   - name: name
   - name: date
     direction: desc
+
+- kind: User
+  ancestor: yes
+  properties:
+  - name: date
+    direction: desc

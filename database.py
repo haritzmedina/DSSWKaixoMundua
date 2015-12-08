@@ -42,7 +42,7 @@ class UserManager:
             user_key
         )
 
-        return users.get()
+        return users
 
     @staticmethod
     def select_by_username(username):
