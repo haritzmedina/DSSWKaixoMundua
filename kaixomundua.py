@@ -28,6 +28,8 @@ from webapp2_extras import i18n
 from webapp2_extras.i18n import gettext as _
 # Add database file
 import database
+# Add API handlers
+import api
 
 JINJA_ENVIRONMENT = jinja2.Environment(
     loader=jinja2.FileSystemLoader(os.path.dirname(__file__)),
@@ -132,9 +134,9 @@ class Language:
         Language.setlanguage(currentLang)
 
 
-
 app = webapp2.WSGIApplication([
     ('/', Welcome),
     ('/register', Register),
-    ('/users', UsersPage)
+    ('/users', UsersPage),
+    webapp2.Route('/api/register/<option>/', api.ApiRegister)
 ], debug=True)
