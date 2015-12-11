@@ -4,3 +4,6 @@
 
 # Python
 *.pyc
+
+# Private keys
+*.key

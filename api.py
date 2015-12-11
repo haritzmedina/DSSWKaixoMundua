@@ -34,3 +34,18 @@ class ApiRegister(webapp2.RequestHandler):
             self.response.write(template.render(feature="register", data=data, query=self.request.query_string, result="FAIL"))
 
 
+class ApiMap(webapp2.RequestHandler):
+    def get(self, option):
+        template = JINJA_ENVIRONMENT.get_template('static/templates/api.json')
+        if option == "searchSite":
+            # TODO Ask google maps API for location
+            # TODO Purge result
+            # TODO Prepare response
+            data = '{"site":"", "lat": , "lng": }'
+            # TODO Write response
+            self.response.write(template.render(feature="map", data=data, query=self.request.query_string, result="OK"))
+
+
+
+
+

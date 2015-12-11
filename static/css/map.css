@@ -1,0 +1,13 @@
+#map {
+    min-height: 300px;
+    min-width: 600px;
+}
+
+#mapContent{
+    min-width: 650px;
+    min-height: 400px;
+}
+
+#search{
+    height: 50px;
+}

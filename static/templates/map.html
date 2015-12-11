@@ -1,0 +1,20 @@
+{% extends "static/templates/base.html" %}
+{% block title %}Map{% endblock %}
+{% block headParams %}
+<link rel="stylesheet" type="text/css" href="stylesheet/map.css"/>
+<meta name="viewport" content="initial-scale=1.0">
+<meta charset="utf-8">
+{% endblock %}
+{% block content %}
+<div id="mapContent">
+    <div id="search">
+
+    </div>
+    <div id="map">
+
+    </div>
+</div>
+<script src="js/map.js"></script>
+<script src="https://maps.googleapis.com/maps/api/js?key={{googleApiKey}}&callback=initMap" async defer></script>
+{% endblock %}
+{% block mapActive %}true{% endblock %}

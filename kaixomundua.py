@@ -97,7 +97,7 @@ class Welcome(webapp2.RequestHandler):
         self.response.write(template.render())
 
 
-# Users manage handler
+# Users show page handler
 class UsersPage(webapp2.RequestHandler):
     def get(self):
         Language.language(self)
@@ -107,6 +107,16 @@ class UsersPage(webapp2.RequestHandler):
         template = JINJA_ENVIRONMENT.get_template('static/templates/users.html')
         self.response.write(template.render(users=users))
 
+# Map page handler
+class MapPage(webapp2.RequestHandler):
+    def get(self):
+        Language.language(self)
+        # Retrieve key
+        key = "AIzaSyCbXo4tS_T_OQj2TQ313FbNOHawoLT6lcA"
+        #key = "AIzaSyDIJ9XX2ZvRKCJcFRrl-lRanEtFUow4piM"
+        # Render template
+        template = JINJA_ENVIRONMENT.get_template('static/templates/map.html')
+        self.response.write(template.render(googleApiKey=key))
 
 # i18n language handler
 class Language:
@@ -138,5 +148,6 @@ app = webapp2.WSGIApplication([
     ('/', Welcome),
     ('/register', Register),
     ('/users', UsersPage),
+    ('/map', MapPage),
     webapp2.Route('/api/register/<option>/', api.ApiRegister)
 ], debug=True)
