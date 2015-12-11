@@ -7,7 +7,7 @@
     "{{query}}",
 
   "data":
-    {{data}},
+    {{data|safe}},
 
   "result":
     "{{result}}"

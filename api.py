@@ -2,7 +2,12 @@ import webapp2
 # Jinja templates
 import os
 import jinja2
+# Database access
 import database
+# Remote services
+import urllib
+# JSON library
+import json
 
 JINJA_ENVIRONMENT = jinja2.Environment(
     loader=jinja2.FileSystemLoader(os.path.dirname(__file__)),
@@ -20,7 +25,7 @@ class ApiRegister(webapp2.RequestHandler):
                 data = '{"email": "'+email+'", "exists": true}'
             else:
                 data = '{"email": "'+email+'", "exists": false}'
-            self.response.write(template.render(feature="register", data=data, query=self.request.query_string, result="OK"))
+            result = "OK"
         elif option == "userExists":
             username = self.request.get("q")
             user = database.UserManager.select_by_username(username)
@@ -28,22 +33,42 @@ class ApiRegister(webapp2.RequestHandler):
                 data = '{"username": "'+username+'", "exists": true}'
             else:
                 data = '{"username": "'+username+'", "exists": false}'
-            self.response.write(template.render(feature="register", data=data, query=self.request.query_string, result="OK"))
+            result = "OK"
         else:
             data = '{"error": "Method not allowed"}'
-            self.response.write(template.render(feature="register", data=data, query=self.request.query_string, result="FAIL"))
+            result = "FAIL"
+        self.response.headers['Content-Type'] = 'application/json'
+        self.response.write(template.render(feature="register", data=data, query=self.request.query_string, result=result))
 
 
 class ApiMap(webapp2.RequestHandler):
     def get(self, option):
         template = JINJA_ENVIRONMENT.get_template('static/templates/api.json')
         if option == "searchSite":
-            # TODO Ask google maps API for location
-            # TODO Purge result
-            # TODO Prepare response
-            data = '{"site":"", "lat": , "lng": }'
-            # TODO Write response
-            self.response.write(template.render(feature="map", data=data, query=self.request.query_string, result="OK"))
+            # Ask google maps API for location
+            service_url = 'http://maps.googleapis.com/maps/api/geocode/json?'
+            address = self.request.get('q')
+            url = service_url + urllib.urlencode({'address': address})
+            uh = urllib.urlopen(url)
+            data = uh.read()
+            js = json.loads(data)
+            # Purge result and prepare response
+            query_result = js['status']
+            if query_result == "OK":
+                address = js['results'][0]['formatted_address']
+                lat = js['results'][0]['geometry']["location"]["lat"]
+                lng = js['results'][0]['geometry']["location"]["lng"]
+                data = '{"site":"'+address+'", "lat": '+str(lat)+', "lng": '+str(lng)+'}'
+                result = "OK"
+            elif query_result == "ZERO_RESULTS":
+                data = '{"error": "Site not found"}'
+                result = "FAIL"
+            else:
+                data = '{"error": "Unknown error"}'
+                result = "FAIL"
+            # Write response
+            self.response.headers['Content-Type'] = 'application/json'
+            self.response.write(template.render(feature="map", data=data, query=self.request.query_string, result=result))
 
 
 

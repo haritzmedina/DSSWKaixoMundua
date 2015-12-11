@@ -113,7 +113,6 @@ class MapPage(webapp2.RequestHandler):
         Language.language(self)
         # Retrieve key
         key = "AIzaSyCbXo4tS_T_OQj2TQ313FbNOHawoLT6lcA"
-        #key = "AIzaSyDIJ9XX2ZvRKCJcFRrl-lRanEtFUow4piM"
         # Render template
         template = JINJA_ENVIRONMENT.get_template('static/templates/map.html')
         self.response.write(template.render(googleApiKey=key))
@@ -149,5 +148,6 @@ app = webapp2.WSGIApplication([
     ('/register', Register),
     ('/users', UsersPage),
     ('/map', MapPage),
-    webapp2.Route('/api/register/<option>/', api.ApiRegister)
+    webapp2.Route('/api/register/<option>/', api.ApiRegister),
+    webapp2.Route('/api/map/<option>/', api.ApiMap)
 ], debug=True)
