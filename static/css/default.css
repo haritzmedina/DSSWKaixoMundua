@@ -2,6 +2,7 @@ html{
     background: url(../images/background.jpg) no-repeat;
     background-size: fixed;
     background-color: black;
+    height:100%;
 }
 
 ::selection{
@@ -14,6 +15,7 @@ body{
     font-size: large;
     min-width: 750px;
     overflow: hidden;
+    height:100%;
 }
 
 header{
