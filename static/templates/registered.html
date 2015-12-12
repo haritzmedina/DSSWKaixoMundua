@@ -1,5 +1,5 @@
 {% extends "static/templates/base.html" %}
-{% block title %}Registered{% endblock %}
+{% block title %}{% trans %}Registered{% endtrans %}{% endblock %}
 {% block headParams %}
 <link rel="stylesheet" type="text/css" href="stylesheet/register.css"/>
 <script type="text/javascript" src="js/register.js"></script>
@@ -7,8 +7,8 @@
 {% endblock %}
 {% block content %}
 <div>
-    {% trans %}Hello{% endtrans %} {{ username }}. {% trans %}Your account is created.{% endtrans %}
-    {% trans %}Welcome to Kaixo Mundua!{% endtrans %}
+    {% trans %}Hello{% endtrans %} {{ username }}. {% trans %}AccountCreated{% endtrans %}
+    {% trans %}WelcomeToKaixoMundua{% endtrans %}
 </div>
 {% endblock %}
 {% block registerActive %}true{% endblock %}

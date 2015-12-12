@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2015-12-08 15:50+0100\n"
+"POT-Creation-Date: 2015-12-12 17:09+0100\n"
 "PO-Revision-Date: 2015-12-02 16:48+0100\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: eu_ES\n"
@@ -19,79 +19,94 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.1.1\n"
 
-#: kaixomundua.py:60
-msgid "Bad email."
+#: kaixomundua.py:63
+#, fuzzy
+msgid "BadEmail."
 msgstr "Email-a ez da egokia."
 
-#: kaixomundua.py:64
-msgid "Password min length not reached."
-msgstr "Pasahitsa luzeagoa izan behar da."
-
-#: kaixomundua.py:68
+#: kaixomundua.py:67
 #, fuzzy
-msgid "Passwords do not match."
-msgstr "Pasahitsak ez dira berdinak."
+msgid "PasswordMinLengthNotReached."
+msgstr "Pasahitsa gutxienez 6 karaktere eduki behar ditu."
 
-#: kaixomundua.py:72
-#, fuzzy
-msgid "Empty username."
-msgstr "Erabiltzailea sartu behar da."
-
-#: kaixomundua.py:76
-#, fuzzy
-msgid "Username exists"
-msgstr "Erabiltzaile izena erabilita dago"
-
-#: kaixomundua.py:81
-msgid "Email exists"
-msgstr "Email-a hartuta dago"
-
-#: static/templates/base.html:24
-msgid "Index"
-msgstr "Hasiera"
-
-#: static/templates/base.html:25 static/templates/register.html:18
-msgid "Register"
-msgstr "Erregistratu"
-
-#: static/templates/base.html:26
-msgid "Users"
-msgstr "Erabiltzaileak"
-
-#: static/templates/register.html:6 static/templates/registered.html:6
+#: kaixomundua.py:71 static/templates/register.html:7
+#: static/templates/registered.html:6
 msgid "PasswordMissmatch"
 msgstr "Pasahitsak ez dira berdinak."
 
-#: static/templates/register.html:11
+#: kaixomundua.py:75
+#, fuzzy
+msgid "EmptyUsername."
+msgstr "Erabiltzailea sartu behar da."
+
+#: kaixomundua.py:79 static/templates/register.html:8
+#, fuzzy
+msgid "UsernameExists"
+msgstr "Erabiltzailearen izena hartuta dago."
+
+#: kaixomundua.py:84 static/templates/register.html:9
+#, fuzzy
+msgid "EmailExists"
+msgstr "Email-a hartuta dago."
+
+#: static/templates/base.html:25
+msgid "Index"
+msgstr "Hasiera"
+
+#: static/templates/base.html:26 static/templates/register.html:2
+#: static/templates/register.html:22
+msgid "Register"
+msgstr "Erregistratu"
+
+#: static/templates/base.html:27 static/templates/users.html:2
+msgid "Users"
+msgstr "Erabiltzaileak"
+
+#: static/templates/base.html:28 static/templates/map.html:2
+msgid "Map"
+msgstr ""
+
+#: static/templates/map.html:11
+msgid "SearchSite"
+msgstr "Lekua bilatu"
+
+#: static/templates/register.html:15
 msgid "Error"
 msgstr "Errorea"
 
-#: static/templates/register.html:14
+#: static/templates/register.html:18
 msgid "Username"
 msgstr "Erabiltzailea"
 
-#: static/templates/register.html:15
+#: static/templates/register.html:19
 msgid "Password"
 msgstr "Pasahitsa"
 
-#: static/templates/register.html:16
+#: static/templates/register.html:20
 msgid "PasswordRepeat"
 msgstr "Pasahitsa berridatzi"
 
-#: static/templates/register.html:17 static/templates/users.html:13
+#: static/templates/register.html:21 static/templates/users.html:13
 msgid "Email"
 msgstr "Email-a"
+
+#: static/templates/registered.html:2
+#, fuzzy
+msgid "Registered"
+msgstr "Erregistratu"
 
 #: static/templates/registered.html:10
 msgid "Hello"
 msgstr "Kaixo"
 
 #: static/templates/registered.html:10
-msgid "Your account is created."
+#, fuzzy
+msgid "AccountCreated"
 msgstr "Zure kontua sortu egin da."
 
 #: static/templates/registered.html:11
-msgid "Welcome to Kaixo Mundua!"
+#, fuzzy
+msgid "WelcomeToKaixoMundua"
 msgstr "Kaixo gure Kaixo Mundua web orrira!"
 
 #: static/templates/users.html:10
@@ -101,7 +116,7 @@ msgstr "Erabiltzailea"
 
 #: static/templates/users.html:16
 #, fuzzy
-msgid "Register date"
+msgid "RegisterDate"
 msgstr "Erregistro eguna"
 
 #: static/templates/users.html:19
@@ -112,4 +127,7 @@ msgstr "Argazkia"
 #, fuzzy
 msgid "HelloWorld"
 msgstr "Kaixo mundua"
+
+#~ msgid "Passwords do not match."
+#~ msgstr "Pasahitsak ez dira berdinak."
 

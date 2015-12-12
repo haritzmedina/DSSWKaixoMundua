@@ -1,5 +1,5 @@
 {% extends "static/templates/base.html" %}
-{% block title %}Register{% endblock %}
+{% block title %}{% trans %}Users{% endtrans %}{% endblock %}
 {% block headParams %}
 <link rel="stylesheet" type="text/css" href="stylesheet/users.css"/>
 {% endblock %}
@@ -13,7 +13,7 @@
             {% trans %}Email{% endtrans %}
         </div>
         <div class="headerCell cell">
-            {% trans %}Register date{% endtrans %}
+            {% trans %}RegisterDate{% endtrans %}
         </div>
         <div class="headerCell cell">
             {% trans %}Photo{% endtrans %}

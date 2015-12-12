@@ -60,28 +60,28 @@ class Register(webapp2.RequestHandler):
 
         # Check email is well formed
         if not re.match(r"[^@]+@[^@]+\.[^@]+", email):
-            self.response.write(registerTemplate.render(error=_("Bad email.")))
+            self.response.write(registerTemplate.render(error=_("BadEmail.")))
             return None
         # Check passwords min size is 6
         if len(password1) < 6:
-            self.response.write(registerTemplate.render(error=_("Password min length not reached.")))
+            self.response.write(registerTemplate.render(error=_("PasswordMinLengthNotReached.")))
             return None
         # Check passwords match
         if password1 != password2:
-            self.response.write(registerTemplate.render(error=_("Passwords do not match.")))
+            self.response.write(registerTemplate.render(error=_("PasswordMissmatch")))
             return None
         # Username not empty
         if len(username) < 1:
-            self.response.write(registerTemplate.render(error=_("Empty username.")))
+            self.response.write(registerTemplate.render(error=_("EmptyUsername.")))
         # Check user exists
         user = database.UserManager.select_by_username(username)
         if user is not None:
-            self.response.write(registerTemplate.render(error=_("Username exists")))
+            self.response.write(registerTemplate.render(error=_("UsernameExists")))
             return None
         # Check email exists
         user = database.UserManager.select_by_email(email)
         if user is not None:
-            self.response.write(registerTemplate.render(error=_("Email exists")))
+            self.response.write(registerTemplate.render(error=_("EmailExists")))
             return None
 
         # Save in DB
@@ -112,7 +112,8 @@ class MapPage(webapp2.RequestHandler):
     def get(self):
         Language.language(self)
         # Retrieve key
-        key = "AIzaSyCbXo4tS_T_OQj2TQ313FbNOHawoLT6lcA"
+        f = open("googlemaps.key")
+        key = f.read()
         # Render template
         template = JINJA_ENVIRONMENT.get_template('static/templates/map.html')
         self.response.write(template.render(googleApiKey=key))
