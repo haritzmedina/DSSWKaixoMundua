@@ -64,7 +64,7 @@ msgstr "Erabiltzaileak"
 
 #: static/templates/base.html:28 static/templates/map.html:2
 msgid "Map"
-msgstr ""
+msgstr "Mapa"
 
 #: static/templates/map.html:11
 msgid "SearchSite"
