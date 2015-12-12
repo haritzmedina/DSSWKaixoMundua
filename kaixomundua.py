@@ -28,6 +28,8 @@ from webapp2_extras import i18n
 from webapp2_extras.i18n import gettext as _
 # Add database file
 import database
+# Add API handlers
+import api
 
 JINJA_ENVIRONMENT = jinja2.Environment(
     loader=jinja2.FileSystemLoader(os.path.dirname(__file__)),
@@ -58,28 +60,28 @@ class Register(webapp2.RequestHandler):
 
         # Check email is well formed
         if not re.match(r"[^@]+@[^@]+\.[^@]+", email):
-            self.response.write(registerTemplate.render(error=_("Bad email.")))
+            self.response.write(registerTemplate.render(error=_("BadEmail.")))
             return None
         # Check passwords min size is 6
         if len(password1) < 6:
-            self.response.write(registerTemplate.render(error=_("Password min length not reached.")))
+            self.response.write(registerTemplate.render(error=_("PasswordMinLengthNotReached.")))
             return None
         # Check passwords match
         if password1 != password2:
-            self.response.write(registerTemplate.render(error=_("Passwords do not match.")))
+            self.response.write(registerTemplate.render(error=_("PasswordMissmatch")))
             return None
         # Username not empty
         if len(username) < 1:
-            self.response.write(registerTemplate.render(error=_("Empty username.")))
+            self.response.write(registerTemplate.render(error=_("EmptyUsername.")))
         # Check user exists
         user = database.UserManager.select_by_username(username)
         if user is not None:
-            self.response.write(registerTemplate.render(error=_("Username exists")))
+            self.response.write(registerTemplate.render(error=_("UsernameExists")))
             return None
         # Check email exists
         user = database.UserManager.select_by_email(email)
         if user is not None:
-            self.response.write(registerTemplate.render(error=_("Email exists")))
+            self.response.write(registerTemplate.render(error=_("EmailExists")))
             return None
 
         # Save in DB
@@ -95,7 +97,7 @@ class Welcome(webapp2.RequestHandler):
         self.response.write(template.render())
 
 
-# Users manage handler
+# Users show page handler
 class UsersPage(webapp2.RequestHandler):
     def get(self):
         Language.language(self)
@@ -105,6 +107,16 @@ class UsersPage(webapp2.RequestHandler):
         template = JINJA_ENVIRONMENT.get_template('static/templates/users.html')
         self.response.write(template.render(users=users))
 
+# Map page handler
+class MapPage(webapp2.RequestHandler):
+    def get(self):
+        Language.language(self)
+        # Retrieve key
+        f = open("googlemaps.key")
+        key = f.read()
+        # Render template
+        template = JINJA_ENVIRONMENT.get_template('static/templates/map.html')
+        self.response.write(template.render(googleApiKey=key))
 
 # i18n language handler
 class Language:
@@ -132,9 +144,11 @@ class Language:
         Language.setlanguage(currentLang)
 
 
-
 app = webapp2.WSGIApplication([
     ('/', Welcome),
     ('/register', Register),
-    ('/users', UsersPage)
+    ('/users', UsersPage),
+    ('/map', MapPage),
+    webapp2.Route('/api/register/<option>/', api.ApiRegister),
+    webapp2.Route('/api/map/<option>/', api.ApiMap)
 ], debug=True)

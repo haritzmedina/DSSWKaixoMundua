@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2015-12-08 15:50+0100\n"
+"POT-Creation-Date: 2015-12-12 17:09+0100\n"
 "PO-Revision-Date: 2015-12-02 16:48+0100\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: es_ES\n"
@@ -19,79 +19,94 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.1.1\n"
 
-#: kaixomundua.py:60
-msgid "Bad email."
+#: kaixomundua.py:63
+#, fuzzy
+msgid "BadEmail."
 msgstr "Email mal formado."
 
-#: kaixomundua.py:64
-msgid "Password min length not reached."
+#: kaixomundua.py:67
+#, fuzzy
+msgid "PasswordMinLengthNotReached."
 msgstr "La longitud minima de la contraseña debe de ser de 6 caracteres."
 
-#: kaixomundua.py:68
-#, fuzzy
-msgid "Passwords do not match."
-msgstr "Las contraseñas no coinciden"
+#: kaixomundua.py:71 static/templates/register.html:7
+#: static/templates/registered.html:6
+msgid "PasswordMissmatch"
+msgstr "Las contraseñas no coinciden."
 
-#: kaixomundua.py:72
+#: kaixomundua.py:75
 #, fuzzy
-msgid "Empty username."
+msgid "EmptyUsername."
 msgstr "Usuario vacio."
 
-#: kaixomundua.py:76
+#: kaixomundua.py:79 static/templates/register.html:8
 #, fuzzy
-msgid "Username exists"
-msgstr "El nombre de usuario está ocupado"
+msgid "UsernameExists"
+msgstr "El nombre de usuario está ocupado."
 
-#: kaixomundua.py:81
-msgid "Email exists"
-msgstr "El email está ocupado"
+#: kaixomundua.py:84 static/templates/register.html:9
+#, fuzzy
+msgid "EmailExists"
+msgstr "El email está ocupado."
 
-#: static/templates/base.html:24
+#: static/templates/base.html:25
 msgid "Index"
 msgstr "Índice"
 
-#: static/templates/base.html:25 static/templates/register.html:18
+#: static/templates/base.html:26 static/templates/register.html:2
+#: static/templates/register.html:22
 msgid "Register"
 msgstr "Registrarse"
 
-#: static/templates/base.html:26
+#: static/templates/base.html:27 static/templates/users.html:2
 msgid "Users"
 msgstr "Usuarios"
 
-#: static/templates/register.html:6 static/templates/registered.html:6
-msgid "PasswordMissmatch"
-msgstr "Las contraseñas no coinciden"
+#: static/templates/base.html:28 static/templates/map.html:2
+msgid "Map"
+msgstr "Mapa"
 
-#: static/templates/register.html:11
+#: static/templates/map.html:11
+msgid "SearchSite"
+msgstr "Buscar lugar"
+
+#: static/templates/register.html:15
 msgid "Error"
 msgstr "Error"
 
-#: static/templates/register.html:14
+#: static/templates/register.html:18
 msgid "Username"
 msgstr "Nombre de usuario"
 
-#: static/templates/register.html:15
+#: static/templates/register.html:19
 msgid "Password"
 msgstr "Contraseña"
 
-#: static/templates/register.html:16
+#: static/templates/register.html:20
 msgid "PasswordRepeat"
 msgstr "Repita contraseña"
 
-#: static/templates/register.html:17 static/templates/users.html:13
+#: static/templates/register.html:21 static/templates/users.html:13
 msgid "Email"
 msgstr "Email"
+
+#: static/templates/registered.html:2
+#, fuzzy
+msgid "Registered"
+msgstr "Registrarse"
 
 #: static/templates/registered.html:10
 msgid "Hello"
 msgstr "Hola"
 
 #: static/templates/registered.html:10
-msgid "Your account is created."
+#, fuzzy
+msgid "AccountCreated"
 msgstr "Tu cuenta ha sido creada"
 
 #: static/templates/registered.html:11
-msgid "Welcome to Kaixo Mundua!"
+#, fuzzy
+msgid "WelcomeToKaixoMundua"
 msgstr "Bienvenido a Kaixo Mundua!"
 
 #: static/templates/users.html:10
@@ -101,7 +116,7 @@ msgstr "Usuario"
 
 #: static/templates/users.html:16
 #, fuzzy
-msgid "Register date"
+msgid "RegisterDate"
 msgstr "Fecha de alta"
 
 #: static/templates/users.html:19
@@ -112,4 +127,7 @@ msgstr "Foto"
 #, fuzzy
 msgid "HelloWorld"
 msgstr "Hola mundo"
+
+#~ msgid "Passwords do not match."
+#~ msgstr "Las contraseñas no coinciden"
 

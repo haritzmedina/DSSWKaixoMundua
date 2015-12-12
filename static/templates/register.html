@@ -1,15 +1,19 @@
 {% extends "static/templates/base.html" %}
-{% block title %}Register{% endblock %}
+{% block title %}{% trans %}Register{% endtrans %}{% endblock %}
 {% block headParams %}
 <link rel="stylesheet" type="text/css" href="stylesheet/register.css"/>
 <script type="text/javascript" src="js/register.js"></script>
-<meta id="trans" data-password-missmatch="{% trans %}PasswordMissmatch{% endtrans %}"/>
+<meta id="trans"
+      data-password-missmatch="{% trans %}PasswordMissmatch{% endtrans %}"
+      data-username-used="{% trans %}UsernameExists{% endtrans %}"
+      data-email-used="{% trans %}EmailExists{% endtrans %}"
+/>
 {% endblock %}
 {% block content %}
 <div>
-    {% if error %}
-    <div id="errorMessage">{% trans %}Error{% endtrans %}: {{ error }}</div>
-    {% endif %}
+    <div id="errorMessage">{% if error %}
+        {% trans %}Error{% endtrans %}: {{ error }}
+        {% endif %}</div>
     <form id="register" method="post" action="/register">
         <div><input type="text" id="username" name="username" required="required" placeholder="{% trans %}Username{% endtrans %}" class="formBox"/></div>
         <div><input type="password" id="password1" name="password1" pattern=".{6,}" required="required"  placeholder="{% trans %}Password{% endtrans %}" class="formBox"/></div>

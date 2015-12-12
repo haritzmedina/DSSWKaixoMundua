@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2015-12-08 15:50+0100\n"
+"POT-Creation-Date: 2015-12-12 17:09+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,64 +17,74 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.1.1\n"
 
-#: kaixomundua.py:60
-msgid "Bad email."
+#: kaixomundua.py:63
+msgid "BadEmail."
 msgstr ""
 
-#: kaixomundua.py:64
-msgid "Password min length not reached."
+#: kaixomundua.py:67
+msgid "PasswordMinLengthNotReached."
 msgstr ""
 
-#: kaixomundua.py:68
-msgid "Passwords do not match."
-msgstr ""
-
-#: kaixomundua.py:72
-msgid "Empty username."
-msgstr ""
-
-#: kaixomundua.py:76
-msgid "Username exists"
-msgstr ""
-
-#: kaixomundua.py:81
-msgid "Email exists"
-msgstr ""
-
-#: static/templates/base.html:24
-msgid "Index"
-msgstr ""
-
-#: static/templates/base.html:25 static/templates/register.html:18
-msgid "Register"
-msgstr ""
-
-#: static/templates/base.html:26
-msgid "Users"
-msgstr ""
-
-#: static/templates/register.html:6 static/templates/registered.html:6
+#: kaixomundua.py:71 static/templates/register.html:7
+#: static/templates/registered.html:6
 msgid "PasswordMissmatch"
 msgstr ""
 
-#: static/templates/register.html:11
-msgid "Error"
+#: kaixomundua.py:75
+msgid "EmptyUsername."
 msgstr ""
 
-#: static/templates/register.html:14
-msgid "Username"
+#: kaixomundua.py:79 static/templates/register.html:8
+msgid "UsernameExists"
+msgstr ""
+
+#: kaixomundua.py:84 static/templates/register.html:9
+msgid "EmailExists"
+msgstr ""
+
+#: static/templates/base.html:25
+msgid "Index"
+msgstr ""
+
+#: static/templates/base.html:26 static/templates/register.html:2
+#: static/templates/register.html:22
+msgid "Register"
+msgstr ""
+
+#: static/templates/base.html:27 static/templates/users.html:2
+msgid "Users"
+msgstr ""
+
+#: static/templates/base.html:28 static/templates/map.html:2
+msgid "Map"
+msgstr ""
+
+#: static/templates/map.html:11
+msgid "SearchSite"
 msgstr ""
 
 #: static/templates/register.html:15
+msgid "Error"
+msgstr ""
+
+#: static/templates/register.html:18
+msgid "Username"
+msgstr ""
+
+#: static/templates/register.html:19
 msgid "Password"
 msgstr ""
 
-#: static/templates/register.html:16
+#: static/templates/register.html:20
 msgid "PasswordRepeat"
 msgstr ""
 
-#: static/templates/register.html:17 static/templates/users.html:13
+#: static/templates/register.html:21 static/templates/users.html:13
 msgid "Email"
+msgstr ""
+
+#: static/templates/registered.html:2
+msgid "Registered"
 msgstr ""
 
 #: static/templates/registered.html:10
@@ -82,11 +92,11 @@ msgid "Hello"
 msgstr ""
 
 #: static/templates/registered.html:10
-msgid "Your account is created."
+msgid "AccountCreated"
 msgstr ""
 
 #: static/templates/registered.html:11
-msgid "Welcome to Kaixo Mundua!"
+msgid "WelcomeToKaixoMundua"
 msgstr ""
 
 #: static/templates/users.html:10
@@ -94,7 +104,7 @@ msgid "Name"
 msgstr ""
 
 #: static/templates/users.html:16
-msgid "Register date"
+msgid "RegisterDate"
 msgstr ""
 
 #: static/templates/users.html:19
