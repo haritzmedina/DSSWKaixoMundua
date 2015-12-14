@@ -14,6 +14,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
+import hashlib
+
 import webapp2
 # Jinja templates
 import os
@@ -26,10 +28,15 @@ from google.appengine.ext import vendor
 vendor.add('lib')
 from webapp2_extras import i18n
 from webapp2_extras.i18n import gettext as _
+from language import Language
 # Add database file
 import database
 # Add API handlers
 import api
+
+# Sessions handler library
+from webapp2_extras import sessions
+import session
 
 JINJA_ENVIRONMENT = jinja2.Environment(
     loader=jinja2.FileSystemLoader(os.path.dirname(__file__)),
@@ -40,7 +47,7 @@ JINJA_ENVIRONMENT.install_gettext_translations(i18n)
 
 
 # Register page backend
-class Register(webapp2.RequestHandler):
+class RegisterPage(webapp2.RequestHandler):
     def get(self):
         Language.language(self)
         template = JINJA_ENVIRONMENT.get_template('static/templates/register.html')
@@ -118,37 +125,35 @@ class MapPage(webapp2.RequestHandler):
         template = JINJA_ENVIRONMENT.get_template('static/templates/map.html')
         self.response.write(template.render(googleApiKey=key))
 
-# i18n language handler
-class Language:
-    def __init__(self):
-        pass
 
-    @staticmethod
-    def setlanguage(lang):
-        i18n.get_i18n().set_locale(lang)
-
-    @staticmethod
-    def language(http):
-        # Language change petition
-        newLang = http.request.get('language')
-        cookieLang = http.request.cookies.get('language')
-        currentLang = None
-        if len(newLang) > 1:
-            currentLang = newLang
+class LoginPage(webapp2.RequestHandler):
+    def get(self):
+        template = JINJA_ENVIRONMENT.get_template('static/templates/login.html')
+        self.response.write(template.render())
+    def post(self):
+        # Load form
+        template = JINJA_ENVIRONMENT.get_template('static/templates/login.html')
+        # Check user and password
+        submittedUsername = self.request.get("username")
+        submittedPassword = hashlib.md5(self.request.get("password")).hexdigest()
+        user = database.UserManager.select_by_username(submittedUsername)
+        if submittedUsername==user.name and submittedPassword==user.password:
+            self.response.write(template.render())
         else:
-            if cookieLang is None or len(cookieLang) < 1:
-                currentLang = 'eu_ES'
-            else:
-                currentLang = cookieLang
-        http.response.set_cookie('language', currentLang, max_age=15724800) # 26 weeks in seconds
-        Language.setlanguage(currentLang)
+            self.response.write(template.render(error=_("InvalidUsernameOrPassword")))
 
+class PhotosPage(webapp2.RequestHandler):
+    def get(self):
+        template = JINJA_ENVIRONMENT.get_template('static/templates/login.html')
+        self.response.write(template.render())
 
 app = webapp2.WSGIApplication([
     ('/', Welcome),
-    ('/register', Register),
+    ('/register', RegisterPage),
     ('/users', UsersPage),
     ('/map', MapPage),
+    ('/login', LoginPage),
+    ('/photos', PhotosPage),
     webapp2.Route('/api/register/<option>/', api.ApiRegister),
     webapp2.Route('/api/map/<option>/', api.ApiMap)
 ], debug=True)

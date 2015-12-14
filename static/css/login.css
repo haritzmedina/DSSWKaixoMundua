@@ -8,14 +8,6 @@
     text-align: center;
 }
 
-.formBox:invalid{
-    border-color: rgba(200,100,100,1);
-}
-
-.formBox:valid{
-    border-color: rgba(100,255,100,1);
-}
-
 #submit{
     background-color: rgba(255,255,255,1);
     width: 256px;
@@ -23,10 +15,6 @@
     margin-top: 15px;
     font-size: large;
     margin-bottom: 15px;
-}
-
-#register{
-    margin: auto;
 }
 
 #errorMessage{
