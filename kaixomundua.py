@@ -37,6 +37,7 @@ import api
 # Sessions handler library
 from webapp2_extras import sessions
 import session
+from session import SessionManager as Session
 
 JINJA_ENVIRONMENT = jinja2.Environment(
     loader=jinja2.FileSystemLoader(os.path.dirname(__file__)),
@@ -47,14 +48,24 @@ JINJA_ENVIRONMENT.install_gettext_translations(i18n)
 
 
 # Register page backend
-class RegisterPage(webapp2.RequestHandler):
+class RegisterPage(session.BaseSessionHandler):
     def get(self):
+        # Session request handler
+        current_session = Session(self)
+        JINJA_ENVIRONMENT.globals['session'] = current_session
+        # Language request handler
         Language.language(self)
+        # TODO check if user is already registered
         template = JINJA_ENVIRONMENT.get_template('static/templates/register.html')
         self.response.write(template.render())
 
     def post(self):
+        # Session request handler
+        current_session = Session(self)
+        JINJA_ENVIRONMENT.globals['session'] = current_session
+        # Language request handler
         Language.language(self)
+        # TODO check if user is already registered
         # Retrieve request data
         username = self.request.get('username')
         password1 = self.request.get('password1')
@@ -62,52 +73,61 @@ class RegisterPage(webapp2.RequestHandler):
         email = self.request.get('email')
 
         # Load success and fail templates
-        registerTemplate = JINJA_ENVIRONMENT.get_template('static/templates/register.html')
-        registeredTemplate = JINJA_ENVIRONMENT.get_template('static/templates/registered.html')
+        register_template = JINJA_ENVIRONMENT.get_template('static/templates/register.html')
+        registered_template = JINJA_ENVIRONMENT.get_template('static/templates/registered.html')
 
         # Check email is well formed
         if not re.match(r"[^@]+@[^@]+\.[^@]+", email):
-            self.response.write(registerTemplate.render(error=_("BadEmail.")))
+            self.response.write(register_template.render(error=_("BadEmail.")))
             return None
         # Check passwords min size is 6
         if len(password1) < 6:
-            self.response.write(registerTemplate.render(error=_("PasswordMinLengthNotReached.")))
+            self.response.write(register_template.render(error=_("PasswordMinLengthNotReached.")))
             return None
         # Check passwords match
         if password1 != password2:
-            self.response.write(registerTemplate.render(error=_("PasswordMissmatch")))
+            self.response.write(register_template.render(error=_("PasswordMissmatch")))
             return None
         # Username not empty
         if len(username) < 1:
-            self.response.write(registerTemplate.render(error=_("EmptyUsername.")))
+            self.response.write(register_template.render(error=_("EmptyUsername.")))
         # Check user exists
         user = database.UserManager.select_by_username(username)
         if user is not None:
-            self.response.write(registerTemplate.render(error=_("UsernameExists")))
+            self.response.write(register_template.render(error=_("UsernameExists")))
             return None
         # Check email exists
         user = database.UserManager.select_by_email(email)
         if user is not None:
-            self.response.write(registerTemplate.render(error=_("EmailExists")))
+            self.response.write(register_template.render(error=_("EmailExists")))
             return None
 
         # Save in DB
-        if database.UserManager.create(username, password1, email, None):
-            self.response.write(registeredTemplate.render(username=username))
+        if database.UserManager.create(username, password1, email):
+            self.response.write(registered_template.render(username=username))
 
 
 # Welcome page backend
-class Welcome(webapp2.RequestHandler):
+class Welcome(session.BaseSessionHandler):
     def get(self):
+        # Session request handler
+        current_session = Session(self)
+        JINJA_ENVIRONMENT.globals['session'] = current_session
+        # Language request handler
         Language.language(self)
         template = JINJA_ENVIRONMENT.get_template('static/templates/welcome.html')
         self.response.write(template.render())
 
 
 # Users show page handler
-class UsersPage(webapp2.RequestHandler):
+class UsersPage(session.BaseSessionHandler):
     def get(self):
+        # Session request handler
+        current_session = Session(self)
+        JINJA_ENVIRONMENT.globals['session'] = current_session
+        # Language request handler
         Language.language(self)
+        # TODO check if user is admin
         # Retrieve users
         users = database.UserManager.select()
         # Render template
@@ -115,37 +135,81 @@ class UsersPage(webapp2.RequestHandler):
         self.response.write(template.render(users=users))
 
 # Map page handler
-class MapPage(webapp2.RequestHandler):
+class MapPage(session.BaseSessionHandler):
     def get(self):
+        # Session request handler
+        current_session = Session(self)
+        JINJA_ENVIRONMENT.globals['session'] = current_session
+        # Language request handler
         Language.language(self)
         # Retrieve key
-        f = open("googlemaps.key")
+        f = open("key/googlemaps.key")
         key = f.read()
         # Render template
         template = JINJA_ENVIRONMENT.get_template('static/templates/map.html')
         self.response.write(template.render(googleApiKey=key))
 
-
-class LoginPage(webapp2.RequestHandler):
+# Login page handler
+class LoginPage(session.BaseSessionHandler):
     def get(self):
-        template = JINJA_ENVIRONMENT.get_template('static/templates/login.html')
-        self.response.write(template.render())
+        # Session request handler
+        current_session = Session(self)
+        JINJA_ENVIRONMENT.globals['session'] = current_session
+        # Language request handler
+        Language.language(self)
+        # Check if user is already logged in
+        if current_session.get_id() is not None:
+            self.redirect("/")
+        else:
+            template = JINJA_ENVIRONMENT.get_template('static/templates/login.html')
+            self.response.write(template.render())
+
     def post(self):
+        # Session request handler
+        current_session = Session(self)
+        JINJA_ENVIRONMENT.globals['session'] = current_session
+        # Language request handler
+        Language.language(self)
+        # Check if user is already logged in
+        if current_session.get_id() is not None:
+            self.redirect("/")
+        # Language task
+        Language.language(self)
         # Load form
         template = JINJA_ENVIRONMENT.get_template('static/templates/login.html')
         # Check user and password
         submittedUsername = self.request.get("username")
         submittedPassword = hashlib.md5(self.request.get("password")).hexdigest()
         user = database.UserManager.select_by_username(submittedUsername)
-        if submittedUsername==user.name and submittedPassword==user.password:
-            self.response.write(template.render())
+        if submittedUsername == user.name and submittedPassword == user.password:
+            # Session initialization
+            current_session.set(self, user.key.id())
+            # Redirection to initial page
+            self.redirect("/")
         else:
             self.response.write(template.render(error=_("InvalidUsernameOrPassword")))
 
-class PhotosPage(webapp2.RequestHandler):
+
+class PhotosPage(session.BaseSessionHandler):
     def get(self):
-        template = JINJA_ENVIRONMENT.get_template('static/templates/login.html')
+        # Session request handler
+        current_session = Session(self)
+        JINJA_ENVIRONMENT.globals['session'] = current_session
+        # Language request handler
+        Language.language(self)
+        template = JINJA_ENVIRONMENT.get_template('static/templates/photos.html')
         self.response.write(template.render())
+
+
+# TODO Remove this class
+class TestPage(session.BaseSessionHandler):
+    def get(self):
+        # Session request handler
+        current_session = Session(self)
+        JINJA_ENVIRONMENT.globals['session'] = current_session
+        # Language request handler
+        Language.language(self)
+        self.response.write(database.UserManager.select_by_id(current_session.get_id()))
 
 app = webapp2.WSGIApplication([
     ('/', Welcome),
@@ -154,6 +218,7 @@ app = webapp2.WSGIApplication([
     ('/map', MapPage),
     ('/login', LoginPage),
     ('/photos', PhotosPage),
+    ('/test', TestPage),# TODO Remove this path
     webapp2.Route('/api/register/<option>/', api.ApiRegister),
     webapp2.Route('/api/map/<option>/', api.ApiMap)
-], debug=True)
+], debug=True, config=session.myconfig_dict)

@@ -23,11 +23,8 @@
 </header>
 <div id="menu">
     <a href="/"><div id="indexTab" class="tab" data-active="{% block welcomeActive %}{% endblock %}">{% trans %}Index{% endtrans %}</div></a>
-    {% if session %}
     <a href="/profile"><div id="profileTab" class="tab" data-active="{% block profileActive %}{% endblock %}">{% trans %}Profile{% endtrans %}</div></a>
-    {% else %}
     <a href="/login"><div id="loginTab" class="tab" data-active="{% block loginActive %}{% endblock %}">{% trans %}Login{% endtrans %}</div></a>
-    {% endif %}
     <a href="/register"><div id="registerTab" class="tab" data-active="{% block registerActive %}{% endblock %}">{% trans %}Register{% endtrans %}</div></a>
     <a href="/users"><div id="showUsersTab" class="tab" data-active="{% block usersActive %}{% endblock %}">{% trans %}Users{% endtrans %}</div></a>
     <a href="/map"><div id="mapTab" class="tab" data-active="{% block mapActive %}{% endblock %}">{% trans %}Map{% endtrans %}</div></a>

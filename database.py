@@ -2,6 +2,7 @@
 from google.appengine.ext import ndb
 import hashlib
 
+import logging
 
 user_key = ndb.Key('User', 'default_user')
 
@@ -12,7 +13,8 @@ class User(ndb.Model):
     password = ndb.TextProperty()
     email = ndb.TextProperty(indexed=True)
     date = ndb.DateTimeProperty(auto_now_add=True)
-    photo = ndb.BlobProperty()
+    photo = ndb.TextProperty() # profile photo url
+    roleLevel = ndb.IntegerProperty() # 0 not activated, 1 activated, 2 admin
 
 
 # Manages users: create, delete, select, modify
@@ -21,13 +23,14 @@ class UserManager:
         pass
 
     @staticmethod
-    def create(username, password, email, photo):
+    def create(username, password, email):
         user = User(parent=user_key)
 
         user.name = username
         user.password = hashlib.md5(password).hexdigest()
         user.email = email
-        user.photo = photo
+        user.photo = ""
+        user.roleLevel = 0
 
         user.put()
         return True;
@@ -65,3 +68,7 @@ class UserManager:
             email
         )
         return user.get()
+
+    @staticmethod
+    def select_by_id(id):
+        return User.get_by_id(id, parent=user_key)
