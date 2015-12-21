@@ -47,7 +47,7 @@ class SessionManager:
     def __init__(self, http):
         # If user is logged in, retrieve user info
         if http.session.get('userid') is not None:
-            self.user = database.UserManager.select_by_id(http.session.get('userid'))
+            self.retrieve_user_data(http.session.get('userid'))
         else:
             self.user = None
 
@@ -61,17 +61,29 @@ class SessionManager:
             return self.user.name
         return None
 
-    def get_role_level(http):
-        if http.session.get('userid') is not None:
-            # Get role level from database
-            return http.session.get('userid')
+    def get_role_level(self):
+        if self.user is not None:
+            return self.user.roleLevel
         return None
 
-    def get_user_email(http):
-        if http.session.get('userid') is not None:
-            # Get email from database
-            return http.session.get('userid')
+    def get_user_email(self):
+        if self.user is not None:
+            return self.user.email
         return None
 
     def set(self, http, user_id):
         http.session['userid'] = user_id
+        self.retrieve_user_data(user_id)
+
+    def retrieve_user_data(self, user_id):
+        # If user is logged in, retrieve user info
+        if user_id is not None:
+            self.user = database.UserManager.select_by_id(user_id)
+        else:
+            self.user = None
+
+
+    def logout(self, http):
+        if (http.session.has_key('userid')):
+            del http.session['userid']
+        self.user = None

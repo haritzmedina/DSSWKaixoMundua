@@ -14,6 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
+import cgi
 import hashlib
 
 import webapp2
@@ -55,7 +56,7 @@ class RegisterPage(session.BaseSessionHandler):
         JINJA_ENVIRONMENT.globals['session'] = current_session
         # Language request handler
         Language.language(self)
-        # TODO check if user is already registered
+        # TODO check if user is already logged in
         template = JINJA_ENVIRONMENT.get_template('static/templates/register.html')
         self.response.write(template.render())
 
@@ -65,12 +66,12 @@ class RegisterPage(session.BaseSessionHandler):
         JINJA_ENVIRONMENT.globals['session'] = current_session
         # Language request handler
         Language.language(self)
-        # TODO check if user is already registered
+        # TODO check if user is already logged in
         # Retrieve request data
-        username = self.request.get('username')
-        password1 = self.request.get('password1')
-        password2 = self.request.get('password2')
-        email = self.request.get('email')
+        username = cgi.escape(self.request.get('username'))
+        password1 = cgi.escape(self.request.get('password1'))
+        password2 = cgi.escape(self.request.get('password2'))
+        email = cgi.escape(self.request.get('email'))
 
         # Load success and fail templates
         register_template = JINJA_ENVIRONMENT.get_template('static/templates/register.html')
@@ -102,9 +103,15 @@ class RegisterPage(session.BaseSessionHandler):
             self.response.write(register_template.render(error=_("EmailExists")))
             return None
 
+        user_id = database.UserManager.create(username, password1, email)
         # Save in DB
-        if database.UserManager.create(username, password1, email):
+        if user_id:
+            current_session.set(self, user_id)
+            JINJA_ENVIRONMENT.globals['session'] = current_session
             self.response.write(registered_template.render(username=username))
+        else:
+            self.response.write(register_template.render(error=_("DatabaseError")))
+            return None
 
 
 # Welcome page backend
@@ -178,10 +185,10 @@ class LoginPage(session.BaseSessionHandler):
         # Load form
         template = JINJA_ENVIRONMENT.get_template('static/templates/login.html')
         # Check user and password
-        submittedUsername = self.request.get("username")
-        submittedPassword = hashlib.md5(self.request.get("password")).hexdigest()
+        submittedUsername = cgi.escape(self.request.get("username"))
+        submittedPassword = hashlib.md5(cgi.escape(self.request.get("password"))).hexdigest()
         user = database.UserManager.select_by_username(submittedUsername)
-        if submittedUsername == user.name and submittedPassword == user.password:
+        if  user is not None and submittedUsername == user.name and submittedPassword == user.password:
             # Session initialization
             current_session.set(self, user.key.id())
             # Redirection to initial page
@@ -201,6 +208,21 @@ class PhotosPage(session.BaseSessionHandler):
         self.response.write(template.render())
 
 
+class LogoutPage(session.BaseSessionHandler):
+    def get(self):
+        # Session request handler
+        current_session = Session(self)
+        JINJA_ENVIRONMENT.globals['session'] = current_session
+        # Language request handler
+        Language.language(self)
+        # TODO Check if user has session started
+        # Logout user
+        current_session.logout(self)
+        # Prompt logout page
+        JINJA_ENVIRONMENT.globals['session'] = current_session
+        template = JINJA_ENVIRONMENT.get_template('static/templates/logout.html')
+        self.response.write(template.render())
+
 # TODO Remove this class
 class TestPage(session.BaseSessionHandler):
     def get(self):
@@ -218,6 +240,7 @@ app = webapp2.WSGIApplication([
     ('/map', MapPage),
     ('/login', LoginPage),
     ('/photos', PhotosPage),
+    ('/logout', LogoutPage),
     ('/test', TestPage),# TODO Remove this path
     webapp2.Route('/api/register/<option>/', api.ApiRegister),
     webapp2.Route('/api/map/<option>/', api.ApiMap)

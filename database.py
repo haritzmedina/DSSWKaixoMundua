@@ -13,8 +13,9 @@ class User(ndb.Model):
     password = ndb.TextProperty()
     email = ndb.TextProperty(indexed=True)
     date = ndb.DateTimeProperty(auto_now_add=True)
-    photo = ndb.TextProperty() # profile photo url
-    roleLevel = ndb.IntegerProperty() # 0 not activated, 1 activated, 2 admin
+    photo = ndb.TextProperty()  # profile photo url
+    roleLevel = ndb.IntegerProperty()  # 0 not activated, 1 activated, 2 admin
+    attempts = ndb.IntegerProperty()  # Number of attempts before block the account
 
 
 # Manages users: create, delete, select, modify
@@ -32,17 +33,17 @@ class UserManager:
         user.photo = ""
         user.roleLevel = 0
 
-        user.put()
-        return True;
+        key = user.put()
+        return key.id()
 
     @staticmethod
     def select():
         users = ndb.gql(
-            'SELECT * '
-            'FROM User '
-            'WHERE ANCESTOR IS :1 '
-            'ORDER BY date DESC',
-            user_key
+                'SELECT * '
+                'FROM User '
+                'WHERE ANCESTOR IS :1 '
+                'ORDER BY date DESC',
+                user_key
         )
 
         return users
@@ -50,22 +51,22 @@ class UserManager:
     @staticmethod
     def select_by_username(username):
         user = ndb.gql(
-            'SELECT * '
-            'FROM User '
-            'WHERE name = :1 '
-            'ORDER BY date DESC',
-            username
+                'SELECT * '
+                'FROM User '
+                'WHERE name = :1 '
+                'ORDER BY date DESC',
+                username
         )
         return user.get()
 
     @staticmethod
     def select_by_email(email):
         user = ndb.gql(
-            'SELECT * '
-            'FROM User '
-            'WHERE email = :1 '
-            'ORDER BY date DESC',
-            email
+                'SELECT * '
+                'FROM User '
+                'WHERE email = :1 '
+                'ORDER BY date DESC',
+                email
         )
         return user.get()
 
