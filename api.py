@@ -8,6 +8,9 @@ import database
 import urllib
 # JSON library
 import json
+# Session handler
+import session
+from session import SessionManager as Session
 
 JINJA_ENVIRONMENT = jinja2.Environment(
     loader=jinja2.FileSystemLoader(os.path.dirname(__file__)),
@@ -15,7 +18,7 @@ JINJA_ENVIRONMENT = jinja2.Environment(
     autoescape=True)
 
 
-class ApiRegister(webapp2.RequestHandler):
+class ApiRegister(session.BaseSessionHandler):
     def get(self, option):
         template = JINJA_ENVIRONMENT.get_template('static/templates/api.json')
         if option == "emailExists":
@@ -41,7 +44,7 @@ class ApiRegister(webapp2.RequestHandler):
         self.response.write(template.render(feature="register", data=data, query=self.request.query_string, result=result))
 
 
-class ApiMap(webapp2.RequestHandler):
+class ApiMap(session.BaseSessionHandler):
     def get(self, option):
         template = JINJA_ENVIRONMENT.get_template('static/templates/api.json')
         if option == "searchSite":
@@ -71,6 +74,8 @@ class ApiMap(webapp2.RequestHandler):
             self.response.write(template.render(feature="map", data=data, query=self.request.query_string, result=result))
 
 
-
-
+class ApiPhotos(session.BaseSessionHandler):
+    def post(self):
+        # Session request handler
+        current_session = Session(self)
 

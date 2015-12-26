@@ -23,6 +23,8 @@ import os
 import jinja2
 # Regular expression
 import re
+
+from google.appengine.api.blobstore import blobstore
 from google.appengine.ext import vendor
 
 # Add language compatibility
@@ -36,7 +38,6 @@ import database
 import api
 
 # Sessions handler library
-from webapp2_extras import sessions
 import session
 from session import SessionManager as Session
 
@@ -141,6 +142,7 @@ class UsersPage(session.BaseSessionHandler):
         template = JINJA_ENVIRONMENT.get_template('static/templates/users.html')
         self.response.write(template.render(users=users))
 
+
 # Map page handler
 class MapPage(session.BaseSessionHandler):
     def get(self):
@@ -155,6 +157,7 @@ class MapPage(session.BaseSessionHandler):
         # Render template
         template = JINJA_ENVIRONMENT.get_template('static/templates/map.html')
         self.response.write(template.render(googleApiKey=key))
+
 
 # Login page handler
 class LoginPage(session.BaseSessionHandler):
@@ -185,10 +188,10 @@ class LoginPage(session.BaseSessionHandler):
         # Load form
         template = JINJA_ENVIRONMENT.get_template('static/templates/login.html')
         # Check user and password
-        submittedUsername = cgi.escape(self.request.get("username"))
-        submittedPassword = hashlib.md5(cgi.escape(self.request.get("password"))).hexdigest()
-        user = database.UserManager.select_by_username(submittedUsername)
-        if  user is not None and submittedUsername == user.name and submittedPassword == user.password:
+        submitted_username = cgi.escape(self.request.get("username"))
+        submitted_password = hashlib.md5(cgi.escape(self.request.get("password"))).hexdigest()
+        user = database.UserManager.select_by_username(submitted_username)
+        if user is not None and submitted_username == user.name and submitted_password == user.password:
             # Session initialization
             current_session.set(self, user.key.id())
             # Redirection to initial page
@@ -197,15 +200,26 @@ class LoginPage(session.BaseSessionHandler):
             self.response.write(template.render(error=_("InvalidUsernameOrPassword")))
 
 
-class PhotosPage(session.BaseSessionHandler):
+class PhotosPage(session.BlobSessionHandler):
     def get(self):
         # Session request handler
         current_session = Session(self)
         JINJA_ENVIRONMENT.globals['session'] = current_session
         # Language request handler
         Language.language(self)
+        # Create upload form
+        upload_url = blobstore.create_upload_url('/api/photos/upload')
         template = JINJA_ENVIRONMENT.get_template('static/templates/photos.html')
-        self.response.write(template.render())
+        self.response.write(template.render(upload_url=upload_url))
+
+
+class ProfilePage(session.BaseSessionHandler):
+    def get(self):
+        # Session request handler
+        current_session = Session(self)
+        JINJA_ENVIRONMENT.globals['session'] = current_session
+        # Language request handler
+        Language.language(self)
 
 
 class LogoutPage(session.BaseSessionHandler):
@@ -223,6 +237,56 @@ class LogoutPage(session.BaseSessionHandler):
         template = JINJA_ENVIRONMENT.get_template('static/templates/logout.html')
         self.response.write(template.render())
 
+
+# Installation page
+class InstallPage(session.BaseSessionHandler):
+    def get(self):
+        # Check if service is already installed
+        if database.InstallManager.isInstalled():
+            self.redirect("/")
+        else:
+            template = JINJA_ENVIRONMENT.get_template('static/templates/install.html')
+            self.response.write(template.render())
+
+    def post(self):
+        # Check if installation is done
+        if database.InstallManager.isInstalled():
+            self.redirect("/")
+            return None
+
+        # Retrieve request data
+        username = cgi.escape(self.request.get('username'))
+        password1 = cgi.escape(self.request.get('password1'))
+        password2 = cgi.escape(self.request.get('password2'))
+        email = cgi.escape(self.request.get('email'))
+
+        # Check email is well formed
+        if not re.match(r"[^@]+@[^@]+\.[^@]+", email):
+            self.response.write("Email is not well formed")
+            return None
+        # Check passwords min size is 6
+        if len(password1) < 6:
+            self.response.write("Passwords minimum length > 6")
+            return None
+        # Check passwords match
+        if password1 != password2:
+            self.response.write("Passwords do not match")
+            return None
+        # Username not empty
+        if len(username) < 1:
+            self.response.write("Username empty")
+        # Check user exists
+        user = database.UserManager.select_by_username(username)
+        if user is not None:
+            self.response.write("Username exists")
+            return None
+        # Create administrator user profile
+        database.UserManager.create_admin(username, password1, email)
+        # Installation done flag enabled
+        database.InstallManager.install()
+        self.response.write("Admin installation done. <a href='/'>Go welcome page</a>.")
+
+
 # TODO Remove this class
 class TestPage(session.BaseSessionHandler):
     def get(self):
@@ -233,6 +297,7 @@ class TestPage(session.BaseSessionHandler):
         Language.language(self)
         self.response.write(database.UserManager.select_by_id(current_session.get_id()))
 
+
 app = webapp2.WSGIApplication([
     ('/', Welcome),
     ('/register', RegisterPage),
@@ -240,8 +305,11 @@ app = webapp2.WSGIApplication([
     ('/map', MapPage),
     ('/login', LoginPage),
     ('/photos', PhotosPage),
+    ('/profile', ProfilePage),
     ('/logout', LogoutPage),
-    ('/test', TestPage),# TODO Remove this path
+    ('/install', InstallPage),
+    ('/test', TestPage),  # TODO Remove this path
     webapp2.Route('/api/register/<option>/', api.ApiRegister),
-    webapp2.Route('/api/map/<option>/', api.ApiMap)
+    webapp2.Route('/api/map/<option>/', api.ApiMap),
+    webapp2.Route('/api/photos/<option>/', api.ApiPhotos)
 ], debug=True, config=session.myconfig_dict)

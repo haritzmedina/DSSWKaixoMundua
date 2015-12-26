@@ -32,9 +32,10 @@
     <a href="/register"><div id="registerTab" class="tab" data-active="{% block registerActive %}{% endblock %}">{% trans %}Register{% endtrans %}</div></a>
     <!-- Show if user is logged in -->
     {% else %}
-        {% if session.get_role_level() < 2 %}
+        {% if session.get_role_level() > 1 %}
         <a href="/profile"><div id="profileTab" class="tab" data-active="{% block profileActive %}{% endblock %}">{% trans %}Profile{% endtrans %}</div></a>
-        {% elif session.get_role_level() == 2 %}
+        {% endif %}
+        {% if session.get_role_level() == 3 %}
         <!-- Show if user is admin -->
         <a href="/users"><div id="showUsersTab" class="tab" data-active="{% block usersActive %}{% endblock %}">{% trans %}Users{% endtrans %}</div></a>
         {% endif %}
