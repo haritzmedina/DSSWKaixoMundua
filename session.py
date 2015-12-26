@@ -43,8 +43,8 @@ class BaseSessionHandler(webapp2.RequestHandler):
         # End of BaseSessionHandler Class
 
 
-# Session Handling class, gets the store, dispatches the request
-class BlobSessionHandler(blobstore_handlers.BlobstoreUploadHandler):
+# Session Handling class for blob uploading content
+class BlobUploadSessionHandler(blobstore_handlers.BlobstoreUploadHandler):
     def dispatch(self):
         # Get a session store for this request.
         self.session_store = sessions.get_store(request=self.request)
@@ -62,6 +62,24 @@ class BlobSessionHandler(blobstore_handlers.BlobstoreUploadHandler):
         # End of BaseSessionHandler Class
 
 
+# Session Handling class for blob downloading content
+class BlobDownloadSessionHandler(blobstore_handlers.BlobstoreDownloadHandler):
+    def dispatch(self):
+        # Get a session store for this request.
+        self.session_store = sessions.get_store(request=self.request)
+        try:
+            # Dispatch the request.
+            webapp2.RequestHandler.dispatch(self)
+        finally:
+            # Save all sessions.
+            self.session_store.save_sessions(self.response)
+
+    @webapp2.cached_property
+    def session(self):
+        # Returns a session using the default cookie key.
+        return self.session_store.get_session()
+        # End of BaseSessionHandler Class
+
 # Handler for retrieving session info
 class SessionManager:
     def __init__(self, http):
@@ -70,6 +88,11 @@ class SessionManager:
             self.retrieve_user_data(http.session.get('userid'))
         else:
             self.user = None
+
+    def get_user_key(self):
+        if self.user is not None:
+            return self.user.key
+        return None
 
     def get_id(self):
         if self.user is not None:

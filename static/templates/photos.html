@@ -5,7 +5,7 @@
 {% block content %}
 {% if session.get_role_level() > 2 %}
 <form id="upload" action="{{upload_url}}" method="POST" enctype="multipart/form-data">
-    <input type="file" id="photouploader" name="photos[]" multiple="multiple" />
+    <input type="file" id="photouploader" name="photo"/>
     <button type="submit">{% trans %}UploadPhotos{% endtrans %}</button>
 </form>
 {% endif %}

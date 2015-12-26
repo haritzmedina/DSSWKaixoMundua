@@ -74,8 +74,31 @@ class ApiMap(session.BaseSessionHandler):
             self.response.write(template.render(feature="map", data=data, query=self.request.query_string, result=result))
 
 
-class ApiPhotos(session.BaseSessionHandler):
+class ApiPhotosUpload(session.BlobUploadSessionHandler):
     def post(self):
+        template = JINJA_ENVIRONMENT.get_template('static/templates/api.json')
         # Session request handler
         current_session = Session(self)
+        # Check if user can upload the photo
+        if current_session.get_role_level() < 2:
+            self.response.headers['Content-Type'] = 'application/json'
+            data = '{"error": "Permission denied"}'
+            result = "FAIL"
+            self.response.write(template.render(feature="map", data=data, query=self.request.query_string, result=result))
+            # TODO remove photo from blob store
+            return None
+        # Retrieve uploaded info
+        upload_files = self.get_uploads("photo")
+        blob_info = upload_files[0]
+        # Save photo to database
+        photo_id = database.PhotosManager.createPhoto("", current_session.get_user_key(), 2, blob_info.key())
+        # Prompt response to user
+        data = '{"photo_id": '+photo_id+'}'
+        result = "OK"
+        self.response.write(template.render(feature="map", data=data, query=self.request.query_string, result=result))
 
+
+class ApiPhotosDownload(session.BlobDownloadSessionHandler):
+    def get(self, file_id):
+        # Session
+        current_session = Session(self)

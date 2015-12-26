@@ -144,12 +144,15 @@ class PhotosManager:
         pass
 
     @staticmethod
-    def createPhoto(name, owner, privacy):
+    def createPhoto(name, owner, privacy, image_key):
         photo = Photo(parent=photo_key)
 
         photo.name = name
         photo.owner = owner
         photo.privacy = privacy
+        photo.image = image_key
+
+        key = photo.put()
 
         return key.id()
 
@@ -162,3 +165,4 @@ class PhotosManager:
             'ORDER BY date DESC',
             photo_key
         )
+        return photos

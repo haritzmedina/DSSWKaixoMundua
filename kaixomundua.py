@@ -200,7 +200,8 @@ class LoginPage(session.BaseSessionHandler):
             self.response.write(template.render(error=_("InvalidUsernameOrPassword")))
 
 
-class PhotosPage(session.BlobSessionHandler):
+# Photos page handler
+class PhotosPage(session.BlobUploadSessionHandler):
     def get(self):
         # Session request handler
         current_session = Session(self)
@@ -208,11 +209,12 @@ class PhotosPage(session.BlobSessionHandler):
         # Language request handler
         Language.language(self)
         # Create upload form
-        upload_url = blobstore.create_upload_url('/api/photos/upload')
+        upload_url = blobstore.create_upload_url('/photos/upload')
         template = JINJA_ENVIRONMENT.get_template('static/templates/photos.html')
         self.response.write(template.render(upload_url=upload_url))
 
 
+# Profile page handler
 class ProfilePage(session.BaseSessionHandler):
     def get(self):
         # Session request handler
@@ -308,8 +310,8 @@ app = webapp2.WSGIApplication([
     ('/profile', ProfilePage),
     ('/logout', LogoutPage),
     ('/install', InstallPage),
+    ('/photos/upload', api.ApiPhotosUpload),
     ('/test', TestPage),  # TODO Remove this path
     webapp2.Route('/api/register/<option>/', api.ApiRegister),
     webapp2.Route('/api/map/<option>/', api.ApiMap),
-    webapp2.Route('/api/photos/<option>/', api.ApiPhotos)
 ], debug=True, config=session.myconfig_dict)
