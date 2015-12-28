@@ -80,6 +80,7 @@ class BlobDownloadSessionHandler(blobstore_handlers.BlobstoreDownloadHandler):
         return self.session_store.get_session()
         # End of BaseSessionHandler Class
 
+
 # Handler for retrieving session info
 class SessionManager:
     def __init__(self, http):
@@ -106,7 +107,7 @@ class SessionManager:
 
     def get_role_level(self):
         if self.user is not None:
-            return self.user.roleLevel
+            return self.user.role_level
         return None
 
     def get_user_email(self):

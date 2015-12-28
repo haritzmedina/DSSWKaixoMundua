@@ -14,7 +14,6 @@ body{
     color: rgba(255,255,255,1);
     font-size: large;
     min-width: 750px;
-    overflow: hidden;
     height:100%;
     background-color: rgba(0,0,0,0.2);
     padding: 5px;

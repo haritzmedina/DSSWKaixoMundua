@@ -1,4 +1,3 @@
-{% extends "static/templates/base.html" %}
 {% block title %}{% trans %}Registered{% endtrans %}{% endblock %}
 {% block headParams %}
 <link rel="stylesheet" type="text/css" href="stylesheet/register.css"/>
@@ -7,9 +6,10 @@
 {% endblock %}
 {% block content %}
 <div>
-    {% trans %}Hello{% endtrans %} {{ username }}. {% trans %}AccountCreated{% endtrans %}.
-    {% trans %}WelcomeToKaixoMundua{% endtrans %}
-    {% trans %}EmailSendForActivation{% endtrans %}.
+    {% if error is not None %}
+    {% trans %}YourAccountIsActivated{% endtrans %} {{ username }}.
+    {% else %}
+    {{ error }}
+    {% endif %}
 </div>
 {% endblock %}
-{% block registerActive %}true{% endblock %}

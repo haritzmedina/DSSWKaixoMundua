@@ -1,5 +1,6 @@
 from webapp2_extras import i18n
 
+
 # i18n language handler
 class Language:
     def __init__(self):

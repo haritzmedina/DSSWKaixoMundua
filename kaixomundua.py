@@ -23,6 +23,9 @@ import os
 import jinja2
 # Regular expression
 import re
+# Date time
+import datetime
+
 
 from google.appengine.api.blobstore import blobstore
 from google.appengine.ext import vendor
@@ -36,6 +39,8 @@ from language import Language
 import database
 # Add API handlers
 import api
+# Add email handler
+import email_handler
 
 # Sessions handler library
 import session
@@ -57,7 +62,10 @@ class RegisterPage(session.BaseSessionHandler):
         JINJA_ENVIRONMENT.globals['session'] = current_session
         # Language request handler
         Language.language(self)
-        # TODO check if user is already logged in
+        # Check if user is already logged in
+        if current_session.get_id() is not None:
+            self.redirect("/")
+            return None
         template = JINJA_ENVIRONMENT.get_template('static/templates/register.html')
         self.response.write(template.render())
 
@@ -67,7 +75,10 @@ class RegisterPage(session.BaseSessionHandler):
         JINJA_ENVIRONMENT.globals['session'] = current_session
         # Language request handler
         Language.language(self)
-        # TODO check if user is already logged in
+        # Check if user is already logged in
+        if current_session.get_id() is not None:
+            self.redirect("/")
+            return None
         # Retrieve request data
         username = cgi.escape(self.request.get('username'))
         password1 = cgi.escape(self.request.get('password1'))
@@ -104,10 +115,16 @@ class RegisterPage(session.BaseSessionHandler):
             self.response.write(register_template.render(error=_("EmailExists")))
             return None
 
-        user_id = database.UserManager.create(username, password1, email)
-        # Save in DB
-        if user_id:
-            current_session.set(self, user_id)
+        # Save new user in DB
+        user_key = database.UserManager.create(username, password1, email)
+
+        if user_key:
+            # Create activation token
+            token_key = database.TokenManager.create_token(user_key)
+            # Send activation email
+            email_handler.Email.send_activation(username, str(token_key.id()), email)
+            # Autologin new user
+            current_session.set(self, user_key.id())
             JINJA_ENVIRONMENT.globals['session'] = current_session
             self.response.write(registered_template.render(username=username))
         else:
@@ -244,7 +261,7 @@ class LogoutPage(session.BaseSessionHandler):
 class InstallPage(session.BaseSessionHandler):
     def get(self):
         # Check if service is already installed
-        if database.InstallManager.isInstalled():
+        if database.InstallManager.is_installed():
             self.redirect("/")
         else:
             template = JINJA_ENVIRONMENT.get_template('static/templates/install.html')
@@ -252,7 +269,7 @@ class InstallPage(session.BaseSessionHandler):
 
     def post(self):
         # Check if installation is done
-        if database.InstallManager.isInstalled():
+        if database.InstallManager.is_installed():
             self.redirect("/")
             return None
 
@@ -289,29 +306,58 @@ class InstallPage(session.BaseSessionHandler):
         self.response.write("Admin installation done. <a href='/'>Go welcome page</a>.")
 
 
-# TODO Remove this class
-class TestPage(session.BaseSessionHandler):
-    def get(self):
+# Account activation handler
+class ActivationPage(session.BaseSessionHandler):
+    def get(self, token_id):
         # Session request handler
         current_session = Session(self)
         JINJA_ENVIRONMENT.globals['session'] = current_session
         # Language request handler
         Language.language(self)
-        self.response.write(database.UserManager.select_by_id(current_session.get_id()))
+
+        # Check if token is expired
+        token = database.TokenManager.select_token_by_id(int(token_id))
+        if (datetime.datetime.now() - datetime.timedelta(days=1) < token.date) and (not token.used):
+            # Activate user
+            user = token.user.get()
+            # Check if user is already activated
+            if user.role_level > 0:
+                self.response.write("Already activated")
+            database.UserManager.modify_user(user.key, role_level=1)
+            # Set token as used
+            database.TokenManager.set_used_token(token.key)
+            self.response.write("Ok")
+        else:
+            self.response.write("Expired")
+        # TODO Prompt activation result
+
+
+# TODO Remove this class
+class TestPage(session.BaseSessionHandler):
+    def get(self):
+        user = database.UserManager.select_by_id(5733953138851840)
+        key = database.TokenManager.create_token(user.key)
+        self.response.write(database.Token.get_by_id(key.id()))
 
 
 app = webapp2.WSGIApplication([
     ('/', Welcome),
+    # Basics
+    ('/install', InstallPage),
+    # User management
     ('/register', RegisterPage),
+    webapp2.Route('/activate/<token_id>/', ActivationPage),
     ('/users', UsersPage),
-    ('/map', MapPage),
     ('/login', LoginPage),
-    ('/photos', PhotosPage),
     ('/profile', ProfilePage),
     ('/logout', LogoutPage),
-    ('/install', InstallPage),
+    # Features
+    ('/map', MapPage),
+    ('/photos', PhotosPage),
     ('/photos/upload', api.ApiPhotosUpload),
     ('/test', TestPage),  # TODO Remove this path
+    # AJAX APIs
     webapp2.Route('/api/register/<option>/', api.ApiRegister),
     webapp2.Route('/api/map/<option>/', api.ApiMap),
+    webapp2.Route('/api/user/<user_id>/<option>/', api.ApiUserManagement),
 ], debug=True, config=session.myconfig_dict)

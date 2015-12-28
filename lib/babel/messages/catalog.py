@@ -15,7 +15,7 @@ import time
 from cgi import parse_header
 from datetime import datetime, time as time_
 from difflib import get_close_matches
-from email import message_from_string
+from email_handler import message_from_string
 from copy import copy
 
 from babel import __version__ as VERSION
