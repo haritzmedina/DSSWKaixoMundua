@@ -314,22 +314,24 @@ class ActivationPage(session.BaseSessionHandler):
         JINJA_ENVIRONMENT.globals['session'] = current_session
         # Language request handler
         Language.language(self)
+        # Load jinja template
+        template = JINJA_ENVIRONMENT.get_template('static/templates/activation.html')
 
         # Check if token is expired
         token = database.TokenManager.select_token_by_id(int(token_id))
-        if (datetime.datetime.now() - datetime.timedelta(days=1) < token.date) and (not token.used):
+        if token and (datetime.datetime.now() - datetime.timedelta(days=1) < token.date) and (not token.used):
             # Activate user
             user = token.user.get()
             # Check if user is already activated
             if user.role_level > 0:
-                self.response.write("Already activated")
+                errorMessage = _("AccountAlreadyActivated")
             database.UserManager.modify_user(user.key, role_level=1)
             # Set token as used
             database.TokenManager.set_used_token(token.key)
-            self.response.write("Ok")
         else:
-            self.response.write("Expired")
+            errorMessage = _("ExpiredTokenOrNotExist")
         # TODO Prompt activation result
+        self.response.write(template.render(error=errorMessage))
 
 
 # TODO Remove this class
@@ -346,7 +348,7 @@ app = webapp2.WSGIApplication([
     ('/install', InstallPage),
     # User management
     ('/register', RegisterPage),
-    webapp2.Route('/activate/<token_id>/', ActivationPage),
+    webapp2.Route('/activate/<token_id>', ActivationPage),
     ('/users', UsersPage),
     ('/login', LoginPage),
     ('/profile', ProfilePage),

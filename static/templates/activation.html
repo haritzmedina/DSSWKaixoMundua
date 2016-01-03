@@ -1,15 +1,11 @@
-{% block title %}{% trans %}Registered{% endtrans %}{% endblock %}
-{% block headParams %}
-<link rel="stylesheet" type="text/css" href="stylesheet/register.css"/>
-<script type="text/javascript" src="js/register.js"></script>
-<meta id="trans" data-password-missmatch="{% trans %}PasswordMissmatch{% endtrans %}"/>
-{% endblock %}
+{% extends "static/templates/base.html" %}
+{% block title %}{% trans %}Activation{% endtrans %}{% endblock %}
 {% block content %}
 <div>
-    {% if error is not None %}
+    {% if not error %}
     {% trans %}YourAccountIsActivated{% endtrans %} {{ username }}.
     {% else %}
-    {{ error }}
+    <div id="errorMessage">{{ error }}</div>
     {% endif %}
 </div>
 {% endblock %}

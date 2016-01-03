@@ -41,7 +41,7 @@ class Email:
         sender_address = "HaritzMedina-KaixoMundua <haritzmedina-kaixomundua@appspot.gserviceaccount.com>"
         subject = _("ConfirmRegistration")
         template = JINJA_ENVIRONMENT.get_template('static/templates/activationEmail.txt')
-        link = "http://" + app_identity.get_default_version_hostname() + "/activate/" + str(token) + "/"
+        link = "http://" + app_identity.get_default_version_hostname() + "/activate/" + str(token)
         body = template.render(link=link)
 
         logging.info(body)

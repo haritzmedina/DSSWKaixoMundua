@@ -14,7 +14,7 @@ body{
     color: rgba(255,255,255,1);
     font-size: large;
     min-width: 750px;
-    height:100%;
+    height: calc(100% - 10px);
     background-color: rgba(0,0,0,0.2);
     padding: 5px;
     margin: 0px;
@@ -93,4 +93,15 @@ header{
 a{
     text-decoration: none;
     color: inherit;
+}
+
+#errorMessage{
+    color: rgba(230,100,100,1);
+    font-size: large;
+    background-color: rgba(50,50,50,0.8);
+    min-width: 150px;
+    width: inherit;
+    min-height: 20px;
+    padding: 15px;
+    border-radius: 7px;
 }
