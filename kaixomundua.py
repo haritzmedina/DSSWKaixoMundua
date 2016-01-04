@@ -226,9 +226,8 @@ class PhotosPage(session.BlobUploadSessionHandler):
         # Language request handler
         Language.language(self)
         # Create upload form
-        upload_url = blobstore.create_upload_url('/photos/upload')
         template = JINJA_ENVIRONMENT.get_template('static/templates/photos.html')
-        self.response.write(template.render(upload_url=upload_url))
+        self.response.write(template.render())
 
 
 # Profile page handler
@@ -337,9 +336,8 @@ class ActivationPage(session.BaseSessionHandler):
 # TODO Remove this class
 class TestPage(session.BaseSessionHandler):
     def get(self):
-        user = database.UserManager.select_by_id(5733953138851840)
-        key = database.TokenManager.create_token(user.key)
-        self.response.write(database.Token.get_by_id(key.id()))
+        photo = database.PhotosManager.get_photo_by_id(5004976929636352)
+        self.response.write(photo)
 
 
 app = webapp2.WSGIApplication([
@@ -356,7 +354,11 @@ app = webapp2.WSGIApplication([
     # Features
     ('/map', MapPage),
     ('/photos', PhotosPage),
+    # Photos AJAX functions
+    webapp2.Route('/photos/manage/<option>', api.ApiPhotosManager),
+    ('/photos/upload/path', api.ApiPhotosUploadPath),
     ('/photos/upload', api.ApiPhotosUpload),
+    webapp2.Route('/photos/download/<photo_id>', api.ApiPhotosDownload),
     ('/test', TestPage),  # TODO Remove this path
     # AJAX APIs
     webapp2.Route('/api/register/<option>/', api.ApiRegister),

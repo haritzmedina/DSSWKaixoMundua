@@ -11,10 +11,14 @@ import json
 import session
 from session import SessionManager as Session
 
+# Blobstore
+from google.appengine.api.blobstore import blobstore
+from google.appengine.ext import blobstore as blobstore_2
+
 JINJA_ENVIRONMENT = jinja2.Environment(
-    loader=jinja2.FileSystemLoader(os.path.dirname(__file__)),
-    extensions=['jinja2.ext.autoescape'],
-    autoescape=True)
+        loader=jinja2.FileSystemLoader(os.path.dirname(__file__)),
+        extensions=['jinja2.ext.autoescape'],
+        autoescape=True)
 
 
 class ApiRegister(session.BaseSessionHandler):
@@ -93,29 +97,54 @@ class ApiPhotosUpload(session.BlobUploadSessionHandler):
             self.response.headers['Content-Type'] = 'application/json'
             data = '{"error": "Permission denied"}'
             result = "FAIL"
-            self.response.write(template.render(feature="map",
+            self.response.write(template.render(feature="photo",
                                                 data=data,
                                                 query=self.request.query_string,
                                                 result=result))
             # TODO remove photo from blob store
             return None
         # Retrieve uploaded info
-        upload_files = self.get_uploads("photo")
+        upload_files = self.get_uploads("file")
         blob_info = upload_files[0]
         # Save photo to database
         photo_id = database.PhotosManager.createPhoto("", current_session.get_user_key(), 2, blob_info.key())
         # Prompt response to user
-        data = '{"photo_id": ' + photo_id + '}'
+        data = '{"photo_id": ' + str(photo_id) + '}'
         result = "OK"
-        self.response.write(template.render(feature="map", data=data, query=self.request.query_string, result=result))
+        self.response.write(template.render(feature="photo", data=data, query=self.request.query_string, result=result))
+
+
+class ApiPhotosUploadPath(session.BlobUploadSessionHandler):
+    def get(self):
+        # Load response template
+        template = JINJA_ENVIRONMENT.get_template('static/templates/api.json')
+        self.response.headers['Content-Type'] = 'application/json'
+        # Retrieve a new session path to upload
+        upload_url = blobstore.create_upload_url('/photos/upload')
+        data = '{"url": "' + upload_url + '"}'
+        self.response.write(template.render(feature="photo", data=data, query=self.request.query_string, result="OK"))
 
 
 class ApiPhotosDownload(session.BlobDownloadSessionHandler):
-    def get(self, file_id):
+    def get(self, photo_id):
         # Session
         current_session = Session(self)
         # Load response template
         template = JINJA_ENVIRONMENT.get_template('static/templates/api.json')
+
+        # TODO Check visualization permissions to current user
+
+        # Retrieve photo url for photo_id
+        photo = database.PhotosManager.get_photo_by_id(int(photo_id))
+        if not photo:
+            self.response.write("No photo")
+        elif not blobstore_2.get(photo.image):
+            self.response.write("No blob")
+        else:
+            # TODO Count photo visited by user
+            self.send_blob(photo.image)
+
+
 
 
 class ApiUserManagement(session.BaseSessionHandler):
@@ -128,7 +157,7 @@ class ApiUserManagement(session.BaseSessionHandler):
         # If user is not admin and not himself, not allow to query anything
         if current_session.get_role_level() < 3 and current_session.get_id() != user_id:
             role_level = str(current_session.get_role_level())
-            data = '{"error": "Permission denied' + role_level +'"}'
+            data = '{"error": "Permission denied' + role_level + '"}'
             result = "FAIL"
             self.response.write(template.render(feature="user",
                                                 data=data,
@@ -207,3 +236,31 @@ class ApiUserManagement(session.BaseSessionHandler):
             result = "FAIL"
         self.response.write(template.render(feature="user", data=data, query=self.request.query_string, result=result))
 
+
+class ApiPhotosManager(session.BaseSessionHandler):
+    def get(self, option):
+        # Session
+        current_session = Session(self)
+        # Load response template
+        template = JINJA_ENVIRONMENT.get_template('static/templates/api.json')
+        self.response.headers['Content-Type'] = 'application/json'
+
+        if option == "list":
+            # TODO List all accesible photos
+            photos = database.PhotosManager.retrieveAllPhotos()
+            data = '{"photos":['
+            for photo in photos:
+                id = photo.key.id()
+                username = photo.owner.get().name
+                date = photo.date
+                name = photo.name
+                data += '{"photo_id": ' + str(id) + ', "username": "' + username + '", "date": "' + str(
+                    date) + '", "name": "' + name + '"},'
+            data = data[:-1]
+            data += ']}'
+            result = "OK"
+        else:
+            # TODO print method not allowed
+            data = '{"error": "Method not allowed"}'
+            result = "FAIL"
+        self.response.write(template.render(feature="user", data=data, query=self.request.query_string, result=result))

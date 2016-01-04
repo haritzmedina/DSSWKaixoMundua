@@ -225,9 +225,13 @@ class PhotosManager:
     def retrieveAllPhotos():
         photos = ndb.gql(
                 'SELECT *'
-                'FROM Photo'
+                'FROM Photo '
                 'WHERE ANCESTOR IS :1 '
-                'ORDER BY date DESC',
+                'ORDER BY date ASC',
                 photo_key
         )
         return photos
+
+    @staticmethod
+    def get_photo_by_id(photo_id):
+        return Photo.get_by_id(photo_id, parent=photo_key)

@@ -1,13 +1,17 @@
 {% extends "static/templates/base.html" %}
 {% block title %}{% trans %}Photos{% endtrans %}{% endblock %}
 {% block headParams %}
+<link rel="stylesheet" type="text/css" href="/stylesheet/photos.css"/>
+<script type="text/javascript" src="/js/dropzone.js"></script>
+<script type="text/javascript" src="/js/photos.js"></script>
 {% endblock %}
 {% block content %}
 {% if session.get_role_level() >= 2 %}
-<form id="upload" action="{{upload_url}}" method="POST" enctype="multipart/form-data">
-    <input type="file" id="photouploader" name="photo"/>
-    <button type="submit">{% trans %}UploadPhotos{% endtrans %}</button>
-</form>
+<div id="photo-dropzone" class="dz-message needsclick">
+    <img src="images/add.png"/><br/>
+    {% trans %}DropPhotoHere{% endtrans %}
+</div>
 {% endif %}
+<div id="photoContainer"></div>
 {% endblock %}
 {% block photosActive %}true{% endblock %}
