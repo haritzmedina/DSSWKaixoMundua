@@ -1,17 +1,50 @@
-#photo > img{
-    max-width: 700px;
-    max-height: 700px;
+#photoContainer{
+    min-width:750px;
+    height: 600px;
+    max-height: 500px;
 }
 
 #photo{
-    width: 100%;
-    max-height: 700px;
+    min-width: 550px;
+    min-height: 500px;
+    float: left;
+    width:70%;
+    text-align: center;
 }
 
-#name{
-    width: 100%;
+#infobox{
+    float: right;
+    width: 25%;
+    min-width:190px;
+    height:300px;
+    background-color: rgba(150,150,150,0.6);
+    padding: 5px;
+}
+
+.infoboxElem{
+    padding-bottom: 5px;
+}
+
+#photo > img{
+    max-height: 500px;
+    max-width: 100%;
+}
+
+.label{
+    text-align: center;
 }
 
 .textInput{
+    height:50px;
+    font-size: large;
+    border-radius: 3px;
+}
 
+#delete > img{
+    width: 50px;
+}
+
+#privacySelector{
+    height:50px;
+    font-size: large;
 }

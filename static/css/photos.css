@@ -18,7 +18,25 @@
 }
 
 .photo{
-    min-width: 300px;
     max-width: 300px;
-    padding: 5px;
+    max-height: 200px;
+    vertical-align: middle;
+    margin-top: -3px;
+
+}
+
+.imageRectangle{
+    min-width: 300px;
+    min-height: 200px;
+    max-width: 300px;
+    max-height: 200px;
+    float: left;
+    background-color: rgba(100,100,100,0.5);
+    text-align: center;
+    margin: 5px;
+    line-height: 200px;
+}
+
+.imageRectangle:hover{
+    background-color: rgba(50,50,50,0.8);
 }

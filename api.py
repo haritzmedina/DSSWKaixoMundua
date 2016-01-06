@@ -276,7 +276,6 @@ class ApiPhotoModify(session.BaseSessionHandler):
 
         photo = database.PhotosManager.get_photo_by_id(int(photo_id))
 
-
         name = self.request.get('name')
         privacy = int(self.request.get('privacy'))
 

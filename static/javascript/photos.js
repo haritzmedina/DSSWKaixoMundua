@@ -35,12 +35,17 @@
             // Create link
             var link = document.createElement('a');
             link.href = "/photo/"+photo_id;
+            // Create div
+            var div = document.createElement('div');
+            div.classList.add("imageRectangle");
             // Create image
             var img = document.createElement('img');
             img.src = "/api/photo/download/"+photo_id;
             img.classList.add("photo");
-            // Append image to link
-            link.appendChild(img);
+            // Append image to container
+            div.appendChild(img);
+            // Append container to link
+            link.appendChild(div);
             // Append to container
             var container = document.getElementById('photosContainer');
             container.insertBefore(link, container.firstChild);
