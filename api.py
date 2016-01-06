@@ -272,22 +272,23 @@ class ApiPhotoModify(session.BaseSessionHandler):
         template = JINJA_ENVIRONMENT.get_template('static/templates/api.json')
         self.response.headers['Content-Type'] = 'application/json'
 
-        # TODO Review permission for this petition (only owner or admin can modify)
-
         photo = database.PhotosManager.get_photo_by_id(int(photo_id))
 
-        name = self.request.get('name')
-        privacy = int(self.request.get('privacy'))
-
-        if photo is not None:
-            database.PhotosManager.modify_photo(photo.key, name, privacy)
-            data = '{"message": "Changes done"}'
-            result = "OK"
-        else:
+        if photo is None:
             data = '{"error": "Photo does not exist."}'
             result = "FAIL"
-
-
+        else:
+            # Check permission for this petition (only owner or admin can modify)
+            if(photo.owner == current_session.get_user_key()) or (current_session.get_role_level() > 2):
+                name = self.request.get('name')
+                privacy = int(self.request.get('privacy'))
+                database.PhotosManager.modify_photo(photo.key, name, privacy)
+                data = '{"message": "Changes done"}'
+                result = "OK"
+            else:
+                data = '{"error": "No permission to change."}'
+                result = "FAIL"
+        # Response result json
         self.response.write(template.render(feature="user", data=data, query=self.request.query_string, result=result))
 
 
@@ -298,4 +299,24 @@ class ApiPhotoDelete(session.BaseSessionHandler):
         # Load response template
         template = JINJA_ENVIRONMENT.get_template('static/templates/api.json')
         self.response.headers['Content-Type'] = 'application/json'
+
+        photo = database.PhotosManager.get_photo_by_id(int(photo_id))
+
+        if photo is None:
+            data = '{"error": "Photo does not exist."}'
+            result = "FAIL"
+        else:
+            # Check permission for this petition (only owner or admin can modify)
+            if(photo.owner == current_session.get_user_key()) or (current_session.get_role_level() > 2):
+                database.PhotosManager.delete_photo(int(photo_id))
+                data = '{"message": "Foto deleted."}'
+                result = "OK"
+            else:
+                data = '{"error": "No permission to change."}'
+                result = "FAIL"
+
+
+        # Response result json
+        self.response.write(template.render(feature="user", data=data, query=self.request.query_string, result=result))
+
 

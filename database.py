@@ -3,6 +3,7 @@ import logging
 
 from google.appengine.ext import ndb
 import hashlib
+from google.appengine.api.blobstore import blobstore
 
 user_key = ndb.Key('User', 'default_user')
 photo_key = ndb.Key('Photo', 'default_photo')
@@ -247,3 +248,13 @@ class PhotosManager:
     @staticmethod
     def get_photo_by_id(photo_id):
         return Photo.get_by_id(photo_id, parent=photo_key)
+
+    @staticmethod
+    def delete_photo(photo_id):
+        # Retrieve photo
+        photo = PhotosManager.get_photo_by_id(photo_id)
+        # Remove blob
+        blobstore.delete(photo.image)
+        # Remove photo
+        photo.key.delete()
+

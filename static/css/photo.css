@@ -38,6 +38,7 @@
     height:50px;
     font-size: large;
     border-radius: 3px;
+    width: 170px;
 }
 
 #delete > img{
@@ -47,4 +48,5 @@
 #privacySelector{
     height:50px;
     font-size: large;
+    width: 170px;
 }
