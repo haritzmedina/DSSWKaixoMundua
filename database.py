@@ -30,7 +30,7 @@ class Token(ndb.Model):
 
 class Photo(ndb.Model):
     owner = ndb.KeyProperty(kind=User, indexed=True)
-    privacy = ndb.IntegerProperty(indexed=True)
+    privacy = ndb.IntegerProperty(indexed=True) # 0 public, 1 selectedUsers, 2 private
     date = ndb.DateTimeProperty(auto_now_add=True)
     name = ndb.TextProperty()
     image = ndb.BlobKeyProperty()
@@ -231,6 +231,18 @@ class PhotosManager:
                 photo_key
         )
         return photos
+
+    @staticmethod
+    def modify_photo(key, name=None, privacy=None):
+        # Retrieve object to modify
+        photo = key.get()
+        # Modify setted values
+        if name is not None:
+            photo.name = name
+        if privacy is not None:
+            photo.privacy = privacy
+        # Apply changes
+        photo.put()
 
     @staticmethod
     def get_photo_by_id(photo_id):

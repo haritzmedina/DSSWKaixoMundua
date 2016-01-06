@@ -11,7 +11,7 @@
             // Request blob upload url to GAE and create dropzone uploader
             $.ajax({
                 dataType: "json",
-                url: "/photos/upload/path",
+                url: "/api/photos/upload/path",
                 data: {},
                 success: function(data){
                     var dropzone = new Dropzone("div#photo-dropzone", {
@@ -32,13 +32,18 @@
         }
 
         function showImage(photo_id){
+            // Create link
+            var link = document.createElement('a');
+            link.href = "/photo/"+photo_id;
             // Create image
             var img = document.createElement('img');
-            img.src = "/photos/download/"+photo_id;
+            img.src = "/api/photo/download/"+photo_id;
             img.classList.add("photo");
+            // Append image to link
+            link.appendChild(img);
             // Append to container
-            var container = document.getElementById('photoContainer');
-            container.insertBefore(img, container.firstChild);
+            var container = document.getElementById('photosContainer');
+            container.insertBefore(link, container.firstChild);
         }
 
         /* Create the dynamic content */
@@ -50,8 +55,8 @@
         }
 
         // Photos visualization
-        // TODO Retrieve all photos
-        $.getJSON("/photos/manage/list", {}, function(data){
+        // Retrieve all photos
+        $.getJSON("/api/photos/manage/list", {}, function(data){
             var photos = data.data.photos;
             for(var i=0;i<photos.length;i++){
                 photo = photos[i];

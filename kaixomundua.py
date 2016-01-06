@@ -153,6 +153,9 @@ class UsersPage(session.BaseSessionHandler):
         # Language request handler
         Language.language(self)
         # TODO check if user is admin
+        if (current_session.get_role_level() < 3):
+            self.redirect("/")
+            return None
         # Retrieve users
         users = database.UserManager.select()
         # Render template
@@ -218,7 +221,7 @@ class LoginPage(session.BaseSessionHandler):
 
 
 # Photos page handler
-class PhotosPage(session.BlobUploadSessionHandler):
+class PhotosPage(session.BaseSessionHandler):
     def get(self):
         # Session request handler
         current_session = Session(self)
@@ -340,6 +343,41 @@ class TestPage(session.BaseSessionHandler):
         self.response.write(photo)
 
 
+class PhotoManagePage(session.BaseSessionHandler):
+    def get(self, photo_id):
+        # Session request handler
+        current_session = Session(self)
+        JINJA_ENVIRONMENT.globals['session'] = current_session
+        # Language request handler
+        Language.language(self)
+        # Load jinja template
+        template = JINJA_ENVIRONMENT.get_template('static/templates/photo.html')
+
+        # Get photo info to display
+        photo = database.PhotosManager.get_photo_by_id(int(photo_id))
+        username = photo.owner.get().name
+        privacy = photo.privacy
+        date = photo.date
+        # Check if user can edit photo attributes
+        edition_permission = (current_session.get_role_level() is 3) or (photo.owner == current_session.get_user_key())
+        # TODO Get visualizations and albums
+
+        # Response page
+        self.response.write(template.render(
+                photo_id=photo_id,
+                owner=username,
+                name=photo.name,
+                edition_permission= edition_permission,
+                date= date,
+                privacy=privacy))
+
+
+# If a page does not exist, return to initial page
+class NotFoundPage(session.BaseSessionHandler):
+    def get(self, args):
+        self.redirect("/")
+
+
 app = webapp2.WSGIApplication([
     ('/', Welcome),
     # Basics
@@ -354,14 +392,18 @@ app = webapp2.WSGIApplication([
     # Features
     ('/map', MapPage),
     ('/photos', PhotosPage),
+    webapp2.Route('/photo/<photo_id>', PhotoManagePage),
     # Photos AJAX functions
-    webapp2.Route('/photos/manage/<option>', api.ApiPhotosManager),
-    ('/photos/upload/path', api.ApiPhotosUploadPath),
-    ('/photos/upload', api.ApiPhotosUpload),
-    webapp2.Route('/photos/download/<photo_id>', api.ApiPhotosDownload),
+    webapp2.Route('/api/photos/manage/<option>', api.ApiPhotosManager),
+    ('/api/photos/upload/path', api.ApiPhotosUploadPath),
+    ('/api/photos/upload', api.ApiPhotosUpload),
+    webapp2.Route('/api/photo/download/<photo_id>', api.ApiPhotoDownload),
+    webapp2.Route('/api/photo/modify/<photo_id>', api.ApiPhotoModify),
+    webapp2.Route('/api/photo/delete/<photo_id>', api.ApiPhotoDelete),
     ('/test', TestPage),  # TODO Remove this path
     # AJAX APIs
     webapp2.Route('/api/register/<option>/', api.ApiRegister),
     webapp2.Route('/api/map/<option>/', api.ApiMap),
     webapp2.Route('/api/user/<user_id>/<option>/', api.ApiUserManagement),
+    webapp2.Route(r'/<:.*>', NotFoundPage)
 ], debug=True, config=session.myconfig_dict)

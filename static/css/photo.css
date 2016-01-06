@@ -1,0 +1,17 @@
+#photo > img{
+    max-width: 700px;
+    max-height: 700px;
+}
+
+#photo{
+    width: 100%;
+    max-height: 700px;
+}
+
+#name{
+    width: 100%;
+}
+
+.textInput{
+
+}

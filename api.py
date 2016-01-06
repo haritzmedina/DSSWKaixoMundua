@@ -120,12 +120,12 @@ class ApiPhotosUploadPath(session.BlobUploadSessionHandler):
         template = JINJA_ENVIRONMENT.get_template('static/templates/api.json')
         self.response.headers['Content-Type'] = 'application/json'
         # Retrieve a new session path to upload
-        upload_url = blobstore.create_upload_url('/photos/upload')
+        upload_url = blobstore.create_upload_url('/api/photos/upload')
         data = '{"url": "' + upload_url + '"}'
         self.response.write(template.render(feature="photo", data=data, query=self.request.query_string, result="OK"))
 
 
-class ApiPhotosDownload(session.BlobDownloadSessionHandler):
+class ApiPhotoDownload(session.BlobDownloadSessionHandler):
     def get(self, photo_id):
         # Session
         current_session = Session(self)
@@ -143,8 +143,6 @@ class ApiPhotosDownload(session.BlobDownloadSessionHandler):
         else:
             # TODO Count photo visited by user
             self.send_blob(photo.image)
-
-
 
 
 class ApiUserManagement(session.BaseSessionHandler):
@@ -264,3 +262,41 @@ class ApiPhotosManager(session.BaseSessionHandler):
             data = '{"error": "Method not allowed"}'
             result = "FAIL"
         self.response.write(template.render(feature="user", data=data, query=self.request.query_string, result=result))
+
+
+class ApiPhotoModify(session.BaseSessionHandler):
+    def post(self, photo_id):
+        # Session
+        current_session = Session(self)
+        # Load response template
+        template = JINJA_ENVIRONMENT.get_template('static/templates/api.json')
+        self.response.headers['Content-Type'] = 'application/json'
+
+        # TODO Review permission for this petition (only owner or admin can modify)
+
+        photo = database.PhotosManager.get_photo_by_id(int(photo_id))
+
+
+        name = self.request.get('name')
+        privacy = int(self.request.get('privacy'))
+
+        if photo is not None:
+            database.PhotosManager.modify_photo(photo.key, name, privacy)
+            data = '{"message": "Changes done"}'
+            result = "OK"
+        else:
+            data = '{"error": "Photo does not exist."}'
+            result = "FAIL"
+
+
+        self.response.write(template.render(feature="user", data=data, query=self.request.query_string, result=result))
+
+
+class ApiPhotoDelete(session.BaseSessionHandler):
+    def get(self, photo_id):
+        # Session
+        current_session = Session(self)
+        # Load response template
+        template = JINJA_ENVIRONMENT.get_template('static/templates/api.json')
+        self.response.headers['Content-Type'] = 'application/json'
+
