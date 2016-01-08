@@ -340,6 +340,23 @@ class ApiUserManagement(session.BaseSessionHandler):
         self.response.write(template.render(feature="user", data=data, query=self.request.query_string, result=result))
 
 
+class ApiUserRecover(session.BaseSessionHandler):
+    def get(self, username):
+        # Load response template
+        template = JINJA_ENVIRONMENT.get_template('static/templates/api.json')
+        self.response.headers['Content-Type'] = 'application/json'
+
+        user = database.UserManager.select_by_username(username)
+        if user is not None:
+            token = database.TokenManager.create_token(user.key)
+            email_handler.Email.send_change_profile(user.name, token.id(), user.email)
+            data = '{"message": "Change profile email send"}'
+            result = "OK"
+        else:
+            data = '{"error": "User not exists"}'
+            result = "ERROR"
+        self.response.write(template.render(feature="user", data=data, query=self.request.query_string, result=result))
+
 class ApiPhotosManager(session.BaseSessionHandler):
     def get(self, option):
         # Session

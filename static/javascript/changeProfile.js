@@ -15,7 +15,7 @@
             document.getElementById("password2").setCustomValidity('');
             return;
         }
-        if(pass1.length>6) {
+        if(pass1.length>=6) {
             if (pass1 != pass2) {
                 var passwordMissmatchMessage = document.getElementById("trans").dataset.passwordMissmatch;
                 document.getElementById("password2").setCustomValidity(passwordMissmatchMessage);

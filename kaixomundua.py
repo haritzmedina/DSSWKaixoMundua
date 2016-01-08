@@ -298,7 +298,7 @@ class LoginPage(session.BaseSessionHandler):
         template = JINJA_ENVIRONMENT.get_template('static/templates/login.html')
         # Check user and password
         submitted_username = cgi.escape(self.request.get("username"))
-        submitted_password = hashlib.md5(cgi.escape(self.request.get("password"))).hexdigest()
+        submitted_password = hashlib.sha1(cgi.escape(self.request.get("password"))).hexdigest()
         user = database.UserManager.select_by_username(submitted_username)
         # Check user exists
         if user is not None:
@@ -500,6 +500,7 @@ app = webapp2.WSGIApplication([
     # User management
     ('/register', RegisterPage),
     webapp2.Route('/activate/<token_id>', ActivationPage),
+    webapp2.Route('/recover/<username>', api.ApiUserRecover),
     ('/users', UsersPage),
     ('/login', LoginPage),
     webapp2.Route('/profile/<user_id>', ProfilePage),

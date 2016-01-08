@@ -102,7 +102,7 @@ class UserManager:
         user = User(parent=user_key)
 
         user.name = username
-        user.password = hashlib.md5(password).hexdigest()
+        user.password = hashlib.sha1(password).hexdigest()
         user.email = email
         user.role_level = role_level
         user.attempts = 0  # First time user has not any login attempt
@@ -125,7 +125,7 @@ class UserManager:
         if username is not None:
             user.name = username
         if password is not None:
-            user.password = password
+            user.password = hashlib.sha1(password).hexdigest()
         if email is not None:
             user.email = email
         if role_level is not None:
