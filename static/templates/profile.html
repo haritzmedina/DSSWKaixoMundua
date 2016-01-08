@@ -4,9 +4,7 @@
     <link rel="stylesheet" type="text/css" href="/stylesheet/profile.css"/>
     <script type="text/javascript" src="/js/profile.js"></script>
     <meta id="trans"
-          data-password-missmatch="{% trans %}PasswordMissmatch{% endtrans %}"
-          data-username-used="{% trans %}UsernameExists{% endtrans %}"
-          data-email-used="{% trans %}EmailExists{% endtrans %}"
+          data-email-send="{% trans %}ChangeProfileEmailSend{% endtrans %}"
     />
     <meta id="userinfo" data-user-id="{{ user.key.id() }}"/>
 {% endblock %}
@@ -19,10 +17,9 @@
         <img src="/images/anonymous.png"/>
         {% endif %}
     </div>
-    {% if tokenEnabled or session.get_role_level() == 3 %}
+    {% if session.get_role_level() == 3 %}
         <div><input type="text" id="username" name="username" required="required" placeholder="{% trans %}Username{% endtrans %}" class="formBox" value="{{ user.name }}"/></div>
         <div><input type="email" id="email" name="email" required="required" placeholder="{% trans %}Email{% endtrans %}" class="formBox" value="{{ user.email }}"/></div>
-
     {% else %}
         <label for="username">{% trans %}Username{% endtrans %}:</label><div id="username">{{ user.name }}</div>
         <label for="username">{% trans %}Email{% endtrans %}:</label><div id="email">{{ user.email }}</div>

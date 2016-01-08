@@ -12,8 +12,23 @@
         });
     }
 
+    function requestProfileChange(){
+        var user_id = document.getElementById("userinfo").dataset.userId;
+        var emailSendMessage = document.getElementById('trans').dataset.emailSend;
+
+        $.get("/api/user/"+user_id+"/profileChangeRequest/",{}, function(data){
+            if(data.result=="OK"){
+                alert(emailSendMessage);
+            }
+            else{
+                alert(data.data.error);
+            }
+        });
+    }
+
     window.onload = function(){
         document.getElementById('username').addEventListener('change', updateUsernameAndEmail);
         document.getElementById('email').addEventListener('change', updateUsernameAndEmail);
+        document.getElementById('requestChangeProfile').addEventListener('click', requestProfileChange);
     };
 })();

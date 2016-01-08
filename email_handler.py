@@ -44,6 +44,24 @@ class Email:
         link = "http://" + app_identity.get_default_version_hostname() + "/activate/" + str(token)
         body = template.render(link=link)
 
+        # TODO Remove logging
+        logging.info(body)
+
+        mail.send_mail(sender_address,
+                       receiver_email,
+                       subject,
+                       body)
+    @staticmethod
+    def send_change_profile(username, token, receiver_email):
+        mail.is_email_valid(receiver_email)
+        sender_address = "HaritzMedina-KaixoMundua <haritzmedina-kaixomundua@appspot.gserviceaccount.com>"
+        subject = _("ChangeProfile")
+        template = JINJA_ENVIRONMENT.get_template('static/templates/changeProfile.txt')
+        link = "http://" + app_identity.get_default_version_hostname() + "/profile/change/" + str(token)
+
+        body = template.render(link=link)
+
+        # TODO Remove logging
         logging.info(body)
 
         mail.send_mail(sender_address,

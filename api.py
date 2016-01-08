@@ -10,6 +10,8 @@ import json
 # Session handler
 import session
 from session import SessionManager as Session
+# Email handler
+import email_handler
 
 # Blobstore
 from google.appengine.api.blobstore import blobstore
@@ -229,6 +231,7 @@ class ApiUserManagement(session.BaseSessionHandler):
         # Load response template
         template = JINJA_ENVIRONMENT.get_template('static/templates/api.json')
         self.response.headers['Content-Type'] = 'application/json'
+        user_id = int(user_id)
         # If user is not admin and not himself, not allow to query anything
         if current_session.get_role_level() < 3 and current_session.get_id() != user_id:
             role_level = str(current_session.get_role_level())
@@ -324,6 +327,13 @@ class ApiUserManagement(session.BaseSessionHandler):
             database.UserManager.modify_user(user.key, attempts=0)  # Account is unblocked with 0 attempts
             data = '{"message": "Account unblock by admin."}'
             result = "OK"
+        elif option == "profileChangeRequest":
+            # Only user himself is allowed to change profile
+            if current_session.get_id() == user_id:
+                token = database.TokenManager.create_token(user.key)
+                email_handler.Email.send_change_profile(user.name, token.id(), user.email)
+                data = '{"message": "Change profile email send"}'
+                result = "OK"
         else:
             data = '{"error": "Method not allowed"}'
             result = "FAIL"

@@ -104,6 +104,7 @@ class RegisterPage(session.BaseSessionHandler):
         # Username not empty
         if len(username) < 1:
             self.response.write(register_template.render(error=_("EmptyUsername.")))
+            return None
         # Check user exists
         user = database.UserManager.select_by_username(username)
         if user is not None:
@@ -130,6 +131,94 @@ class RegisterPage(session.BaseSessionHandler):
         else:
             self.response.write(register_template.render(error=_("DatabaseError")))
             return None
+
+
+class ChangeProfilePage(session.BaseSessionHandler):
+    # Present the form to change profile
+    def get(self, token_id):
+        # Session request handler
+        current_session = Session(self)
+        JINJA_ENVIRONMENT.globals['session'] = current_session
+        # Language request handler
+        Language.language(self)
+
+        token = database.TokenManager.select_token_by_id(int(token_id))
+        if token and (datetime.datetime.now() - datetime.timedelta(days=1) < token.date) and (not token.used):
+            # Present web page
+            template = JINJA_ENVIRONMENT.get_template('static/templates/changeProfile.html')
+            user = token.user.get()
+            self.response.write(template.render(user=user, token_id=token_id))
+        else:
+            self.redirect("/")
+
+    # Update the profile with received data
+    def post(self, token_id):
+        # Session request handler
+        current_session = Session(self)
+        JINJA_ENVIRONMENT.globals['session'] = current_session
+        # Language request handler
+        Language.language(self)
+
+        # Load templates
+        change_template = JINJA_ENVIRONMENT.get_template('static/templates/changeProfile.html')
+
+        token = database.TokenManager.select_token_by_id(int(token_id))
+        if not(token and (datetime.datetime.now() - datetime.timedelta(days=1) < token.date) and (not token.used)):
+            self.redirect("/")
+
+        user = token.user.get()
+
+        # Check username
+        username = cgi.escape(self.request.get('username'))
+        # If username is modified
+        if username != user.name:
+            # Username not empty
+            if len(username) < 1:
+                self.response.write(change_template.render(user=user, error=_("EmptyUsername.")))
+                return None
+            # Check username not taken
+            dbusername = database.UserManager.select_by_username(username)
+            if dbusername is not None:
+                self.response.write(change_template.render(user=user, error=_("UsernameExists")))
+                return None
+
+        # Check email
+        email = cgi.escape(self.request.get('email'))
+        # If email is modified
+        if email != user.email:
+            # Check email is well formed
+            if not re.match(r"[^@]+@[^@]+\.[^@]+", email):
+                self.response.write(change_template.render(user=user, error=_("BadEmail.")))
+                return None
+            # Check email not taken
+            dbuseremail = database.UserManager.select_by_email(email)
+            if dbuseremail is not None:
+                self.response.write(change_template.render(user=user, error=_("EmailExists")))
+                return None
+
+        # Check passwords
+        request_password1 = self.request.get('password1', None)
+        request_password2 = self.request.get('password2', None)
+        password1 = cgi.escape(request_password1)
+        password2 = cgi.escape(request_password2)
+        # Save user and email if passwords are not changed
+        if len(password1) < 1 or len(password2) < 1:
+            database.UserManager.modify_user(user.key, username=username, email=email)
+        else:
+            # Check passwords before modify user data
+            if len(password1) < 6:
+                self.response.write(change_template.render(user=user, error=_("PasswordMinLengthNotReached.")))
+                return None
+            # Check passwords match
+            if password1 != password2:
+                self.response.write(change_template.render(user=user, error=_("PasswordMissmatch")))
+                return None
+            database.UserManager.modify_user(user.key, username=username, password=password1, email=email)
+
+        # If data is changed, set token as used
+        database.TokenManager.set_used_token(token.key)
+        # Response changed values
+        self.redirect("/profile/"+str(user.key.id()))
 
 
 # Welcome page backend
@@ -414,6 +503,7 @@ app = webapp2.WSGIApplication([
     ('/users', UsersPage),
     ('/login', LoginPage),
     webapp2.Route('/profile/<user_id>', ProfilePage),
+    webapp2.Route('/profile/change/<token_id>', ChangeProfilePage),
     ('/logout', LogoutPage),
     # Features
     ('/map', MapPage),
