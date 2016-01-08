@@ -3,8 +3,9 @@
         // Add change event handlers
         document.getElementById('nameInput').addEventListener('change', uploadChanges);
         document.getElementById('privacySelector').addEventListener('change', uploadChanges);
-
-        document.getElementById('delete').addEventListener('click', deleteImage)
+        document.getElementById('delete').addEventListener('click', deleteImage);
+        document.getElementById('setAsBackground').addEventListener('click', setAsBackground);
+        document.getElementById('setAsProfilePhoto').addEventListener('click', setAsProfilePhoto);
     };
 
     // Modify ajax function
@@ -32,6 +33,28 @@
                     console.log(data);
                 }
             });
+        }
+    }
+
+    function setAsBackground(event){
+        var messageToDisplay = document.getElementById("trans").dataset.setAsBackground;
+        if(confirm(messageToDisplay)){
+            var photo_id = document.getElementById('photo').dataset.photoId;
+            var user_id = document.getElementById("userinfo").dataset.userId;
+            $.post("/api/user/"+user_id+"/changeUserData/", {background: photo_id}, function(data){
+                console.log(data);
+            })
+        }
+    }
+
+    function setAsProfilePhoto(event){
+        var messageToDisplay = document.getElementById("trans").dataset.setAsProfilePhoto;
+        if(confirm(messageToDisplay)){
+            var photo_id = document.getElementById('photo').dataset.photoId;
+            var user_id = document.getElementById("userinfo").dataset.userId;
+            $.post("/api/user/"+user_id+"/changeUserData/", {photo: photo_id}, function(data){
+                console.log(data);
+            })
         }
     }
 })();

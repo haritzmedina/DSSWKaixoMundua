@@ -146,6 +146,83 @@ class ApiPhotoDownload(session.BlobDownloadSessionHandler):
 
 
 class ApiUserManagement(session.BaseSessionHandler):
+    def post(self, user_id, option):
+        # Session
+        current_session = Session(self)
+        # Load response template
+        template = JINJA_ENVIRONMENT.get_template('static/templates/api.json')
+        self.response.headers['Content-Type'] = 'application/json'
+        # Check if request is done by admin or himself
+        user_id = int(user_id)
+        if current_session.get_role_level() < 3 and current_session.get_id() != user_id:
+            role_level = str(current_session.get_role_level())
+            data = '{"error": "Permission denied"}'
+            result = "FAIL"
+            self.response.write(template.render(feature="user",
+                                                data=data,
+                                                query=self.request.query_string,
+                                                result=result))
+            return None
+        # Check if user exists
+        user = database.UserManager.select_by_id(int(user_id))
+        # If user not exists
+        if user is None:
+            data = '{"error": "User not exists."}'
+            result = "FAIL"
+            self.response.write(template.render(feature="user",
+                                                data=data,
+                                                query=self.request.query_string,
+                                                result=result))
+            return None
+
+        # Options
+        if option == "changeUserData":  # update email and user
+            email = self.request.get("email", None)
+            username = self.request.get("username", None)
+            background = self.request.get("background", None)
+            photo_id = self.request.get("photo", None)
+
+            if email is not None:
+                userbyemail = database.UserManager.select_by_email(email)
+                if userbyemail is None:
+                    database.UserManager.modify_user(user.key, email=email)
+                else:
+                    data = '{"error": "Field exists", "field": "email"}'
+                    result = "FAIL"
+                    self.response.write(template.render(feature="user", data=data, query=self.request.query_string, result=result))
+
+            if username is not None:
+                userbyname = database.UserManager.select_by_username(username)
+                if userbyname is None:
+                    database.UserManager.modify_user(user.key, username=username)
+                else:
+                    data = '{"error": "Field exists", "field": "username"}'
+                    result = "FAIL"
+                    self.response.write(template.render(feature="user", data=data, query=self.request.query_string, result=result))
+            if background is not None:
+                # Check if photo exists
+                background_photo = database.PhotosManager.get_photo_by_id(int(background))
+                if background_photo is not None:
+                    # Change user background image
+                    database.UserManager.modify_user(user.key, background=background_photo.key.id())
+                else:
+                    data = '{"error": "Field not exists", "field": "background"}'
+                    result = "FAIL"
+                    self.response.write(template.render(feature="user", data=data, query=self.request.query_string, result=result))
+            if photo_id is not None:
+                # Check if photo exists
+                photo = database.PhotosManager.get_photo_by_id(int(photo_id))
+                if photo is not None:
+                    # Change user background image
+                    database.UserManager.modify_user(user.key, photo=photo.key.id())
+                else:
+                    data = '{"error": "Field not exists", "field": "background"}'
+                    result = "FAIL"
+                    self.response.write(template.render(feature="user", data=data, query=self.request.query_string, result=result))
+            data = '{"message": "User updated"}'
+            result = "OK"
+            self.response.write(template.render(feature="user", data=data, query=self.request.query_string, result=result))
+
     def get(self, user_id, option):
         # Session
         current_session = Session(self)
@@ -162,21 +239,23 @@ class ApiUserManagement(session.BaseSessionHandler):
                                                 query=self.request.query_string,
                                                 result=result))
             return None
+        # Check if user exists
+        user = database.UserManager.select_by_id(int(user_id))
+        # If user not exists
+        if user is None:
+            data = '{"error": "User not exists."}'
+            result = "FAIL"
+            self.response.write(template.render(feature="user",
+                                                data=data,
+                                                query=self.request.query_string,
+                                                result=result))
+            return None
+
         # Options
         if option == "activateAccountByAdmin":
             # Only admin is allowed to change permissions
             if current_session.get_role_level() < 3:
                 data = '{"error": "You cannot change your permission level."}'
-                result = "FAIL"
-                self.response.write(template.render(feature="user",
-                                                    data=data,
-                                                    query=self.request.query_string,
-                                                    result=result))
-                return None
-            user = database.UserManager.select_by_id(int(user_id))
-            # If user not exists
-            if user is None:
-                data = '{"error": "User not exists."}'
                 result = "FAIL"
                 self.response.write(template.render(feature="user",
                                                     data=data,
@@ -206,16 +285,6 @@ class ApiUserManagement(session.BaseSessionHandler):
                                                     query=self.request.query_string,
                                                     result=result))
                 return None
-            user = database.UserManager.select_by_id(int(user_id))
-            # If user not exists
-            if user is None:
-                data = '{"error": "User not exists."}'
-                result = "FAIL"
-                self.response.write(template.render(feature="user",
-                                                    data=data,
-                                                    query=self.request.query_string,
-                                                    result=result))
-                return None
             # If user has not his account activated, admin cannot active it
             if user.role_level != 2:
                 data = '{"error": "User account can not deactivated."}'
@@ -228,6 +297,32 @@ class ApiUserManagement(session.BaseSessionHandler):
             # Activate account by admin
             database.UserManager.modify_user(user.key, role_level=1)
             data = '{"message": "Account deactivated by admin."}'
+            result = "OK"
+        elif option == "blockAccount":
+            # Only admin is allowed to block account
+            if current_session.get_role_level() < 3:
+                data = '{"error": "You cannot change your permission level."}'
+                result = "FAIL"
+                self.response.write(template.render(feature="user",
+                                                data=data,
+                                                query=self.request.query_string,
+                                                result=result))
+                return None
+            database.UserManager.modify_user(user.key, attempts=3)  # Account is blocked with 3 attempts
+            data = '{"message": "Account blocked by admin."}'
+            result = "OK"
+        elif option == "unblockAccount":
+            # Only admin is allowed to unblock account
+            if current_session.get_role_level() < 3:
+                data = '{"error": "You cannot change your permission level."}'
+                result = "FAIL"
+                self.response.write(template.render(feature="user",
+                                                    data=data,
+                                                    query=self.request.query_string,
+                                                    result=result))
+                return None
+            database.UserManager.modify_user(user.key, attempts=0)  # Account is unblocked with 0 attempts
+            data = '{"message": "Account unblock by admin."}'
             result = "OK"
         else:
             data = '{"error": "Method not allowed"}'
@@ -314,7 +409,6 @@ class ApiPhotoDelete(session.BaseSessionHandler):
             else:
                 data = '{"error": "No permission to change."}'
                 result = "FAIL"
-
 
         # Response result json
         self.response.write(template.render(feature="user", data=data, query=self.request.query_string, result=result))

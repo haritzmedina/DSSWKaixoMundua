@@ -1,36 +1,51 @@
 {% extends "static/templates/base.html" %}
-{% block title %}{% if name %}{{name}} - {% endif %}{% trans %}Photo{% endtrans %}{% endblock %}
+{% block title %}{% if name %}{{ name }} - {% endif %}{% trans %}Photo{% endtrans %}{% endblock %}
 {% block headParams %}
-<link rel="stylesheet" href="/stylesheet/photo.css"/>
-<script type="text/javascript" src="/js/photo.js"></script>
-<meta id="trans"
-      data-want-to-delete="{% trans %}WantToDeletePhoto{% endtrans %}"
-/>
+    <link rel="stylesheet" href="/stylesheet/photo.css"/>
+    <script type="text/javascript" src="/js/photo.js"></script>
+    <meta id="trans"
+          data-want-to-delete="{% trans %}WantToDeletePhoto{% endtrans %}"
+          data-set-as-background="{% trans %}SetAsBackgroundQuestion{% endtrans %}"
+          data-set-as-profile-photo="{% trans %}SetAsProfilePhotoQuestion{% endtrans %}"
+    />
+    {% if session.get_id() != None %}
+        <meta id="userinfo" data-user-id="{{ session.get_id() }}"/>
+    {% endif %}
 {% endblock %}
 {% block content %}
-<div id="photoContainer">
-    <div id="photo" data-photo-id="{{photo_id}}"><img src="/api/photo/download/{{photo_id}}"/></div>
-    <div id="infobox">
-        <div id="owner" class="infoboxElem"><label for="nameInput" class="label">{% trans %}PhotoDoneBy{% endtrans %}</label>: <br/>{{owner}}</div>
-        <div id="date" class="infoboxElem"><label for="nameInput" class="label">{% trans %}PhotoDoneIn{% endtrans %}</label>: <br/>{{date}}</div>
-        {% if edition_permission %}
-        <div id="nameEditable" class="infoboxElem">
-            <input id="nameInput" value="{{name}}" class="textInput" placeholder="{% trans %}PhotoName{% endtrans %}"/>
+    <div id="photoContainer">
+        <div id="photo" data-photo-id="{{ photo_id }}"><img src="/api/photo/download/{{ photo_id }}"/></div>
+        <div id="infobox">
+            <div id="owner" class="infoboxElem"><label for="nameInput" class="label">{% trans %}
+                PhotoDoneBy{% endtrans %}</label>: <br/><a href="/profile/{{ owner.key.id() }}">{{ owner.name }}</a></div>
+            <div id="date" class="infoboxElem"><label for="nameInput" class="label">{% trans %}
+                PhotoDoneIn{% endtrans %}</label>: <br/>{{ date }}</div>
+            {% if session.get_id() != None %}
+                <div id="setAsBackground">{% trans %}SetAsBackground{% endtrans %}</div>
+                <div id="setAsProfilePhoto">{% trans %}SetAsProfilePhoto{% endtrans %}</div>
+            {% endif %}
+            {% if edition_permission %}
+                <div id="nameEditable" class="infoboxElem">
+                    <input id="nameInput" value="{{ name }}" class="textInput"
+                           placeholder="{% trans %}PhotoName{% endtrans %}"/>
+                </div>
+                <div id="privacy" class="infoboxElem">
+                    <select id="privacySelector">
+                        <option value="0"{% if privacy == 0 %} selected="selected"{% endif %}>{% trans %}
+                            Public{% endtrans %}</option>
+                        <option value="1"{% if privacy == 1 %} selected="selected"{% endif %}>{% trans %}
+                            RestrictedUsers{% endtrans %}</option>
+                        <option value="2"{% if privacy == 2 %} selected="selected"{% endif %}>{% trans %}
+                            Private{% endtrans %}</option>
+                    </select>
+                </div>
+                <div id="visualizations" class="infoboxElem"></div>
+                <div id="delete" class="infoboxElem"><img src="/images/delete.png"></div>
+            {% else %}
+                <div id="nameLabel" class="infoboxElem">{{ name }}</div>
+                <div id="albums" class="infoboxElem"></div>
+            {% endif %}
         </div>
-        <div id="privacy" class="infoboxElem">
-            <select id="privacySelector">
-                <option value="0"{% if privacy == 0 %} selected="selected"{% endif %}>{% trans %}Public{% endtrans %}</option>
-                <option value="1"{% if privacy == 1 %} selected="selected"{% endif %}>{% trans %}RestrictedUsers{% endtrans %}</option>
-                <option value="2"{% if privacy == 2 %} selected="selected"{% endif %}>{% trans %}Private{% endtrans %}</option>
-            </select>
-        </div>
-        <div id="visualizations" class="infoboxElem"></div>
-        <div id="delete" class="infoboxElem"><img src="/images/delete.png"></div>
-        {% else %}
-        <div id="nameLabel" class="infoboxElem">{{name}}</div>
-        <div id="albums" class="infoboxElem"></div>
-        {% endif %}
     </div>
-</div>
 {% endblock %}
 {% block photosActive %}true{% endblock %}

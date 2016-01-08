@@ -17,8 +17,8 @@ class User(ndb.Model):
     password = ndb.TextProperty()
     email = ndb.TextProperty(indexed=True)
     date = ndb.DateTimeProperty(auto_now_add=True)
-    photo = ndb.TextProperty()  # Profile photo url
-    background = ndb.TextProperty()  # Web page background image
+    photo = ndb.IntegerProperty()  # Profile photo id
+    background = ndb.IntegerProperty()  # Web page background photo id
     role_level = ndb.IntegerProperty()  # 0 not activated, 1 activated by user, 2 activated by admin, 3 admin account
     attempts = ndb.IntegerProperty()  # Number of attempts before blocking the account
 
@@ -105,6 +105,7 @@ class UserManager:
         user.password = hashlib.md5(password).hexdigest()
         user.email = email
         user.role_level = role_level
+        user.attempts = 0  # First time user has not any login attempt
 
         key = user.put()
         return key

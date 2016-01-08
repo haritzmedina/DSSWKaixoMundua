@@ -115,6 +115,11 @@ class SessionManager:
             return self.user.email
         return None
 
+    def get_user_background(self):
+        if self.user is not None:
+            return self.user.background
+        return None
+
     def set(self, http, user_id):
         http.session['userid'] = user_id
         self.retrieve_user_data(user_id)

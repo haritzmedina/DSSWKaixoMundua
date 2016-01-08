@@ -152,7 +152,7 @@ class UsersPage(session.BaseSessionHandler):
         JINJA_ENVIRONMENT.globals['session'] = current_session
         # Language request handler
         Language.language(self)
-        # TODO check if user is admin
+        # Check if user is admin
         if (current_session.get_role_level() < 3):
             self.redirect("/")
             return None
@@ -211,11 +211,24 @@ class LoginPage(session.BaseSessionHandler):
         submitted_username = cgi.escape(self.request.get("username"))
         submitted_password = hashlib.md5(cgi.escape(self.request.get("password"))).hexdigest()
         user = database.UserManager.select_by_username(submitted_username)
-        if user is not None and submitted_username == user.name and submitted_password == user.password:
-            # Session initialization
-            current_session.set(self, user.key.id())
-            # Redirection to initial page
-            self.redirect("/")
+        # Check user exists
+        if user is not None:
+            # Check if user account is blocked or not
+            if user.attempts < 3:
+                # Check if user and password matches
+                if submitted_username == user.name and submitted_password == user.password:
+                    # Session initialization
+                    current_session.set(self, user.key.id())
+                    # Login attempts to zero
+                    database.UserManager.modify_user(user.key, attempts=0)
+                    # Redirection to initial page
+                    self.redirect("/")
+                else:
+                    # Add an attempt to user login
+                    database.UserManager.modify_user(user.key, attempts=user.attempts+1)
+                    self.response.write(template.render(error=_("InvalidUsernameOrPassword")))
+            else:
+                self.response.write(template.render(error=_("AccountBlocked")))
         else:
             self.response.write(template.render(error=_("InvalidUsernameOrPassword")))
 
@@ -235,12 +248,23 @@ class PhotosPage(session.BaseSessionHandler):
 
 # Profile page handler
 class ProfilePage(session.BaseSessionHandler):
-    def get(self):
+    def get(self, user_id):
         # Session request handler
         current_session = Session(self)
         JINJA_ENVIRONMENT.globals['session'] = current_session
         # Language request handler
         Language.language(self)
+
+        # Retrieved user_id to integer
+        user_id = int(user_id)
+
+        user = database.UserManager.select_by_id(user_id)
+
+        # TODO Retrieve album and send to template
+
+        # Prompt page
+        template = JINJA_ENVIRONMENT.get_template('static/templates/profile.html')
+        self.response.write(template.render(user=user))
 
 
 class LogoutPage(session.BaseSessionHandler):
@@ -327,12 +351,14 @@ class ActivationPage(session.BaseSessionHandler):
             # Check if user is already activated
             if user.role_level > 0:
                 errorMessage = _("AccountAlreadyActivated")
+            else:
+                errorMessage = None
             database.UserManager.modify_user(user.key, role_level=1)
             # Set token as used
             database.TokenManager.set_used_token(token.key)
         else:
             errorMessage = _("ExpiredTokenOrNotExist")
-        # TODO Prompt activation result
+        # Prompt activation result
         self.response.write(template.render(error=errorMessage))
 
 
@@ -355,7 +381,7 @@ class PhotoManagePage(session.BaseSessionHandler):
 
         # Get photo info to display
         photo = database.PhotosManager.get_photo_by_id(int(photo_id))
-        username = photo.owner.get().name
+        user = photo.owner.get()
         privacy = photo.privacy
         date = photo.date
         # Check if user can edit photo attributes
@@ -365,7 +391,7 @@ class PhotoManagePage(session.BaseSessionHandler):
         # Response page
         self.response.write(template.render(
                 photo_id=photo_id,
-                owner=username,
+                owner=user,
                 name=photo.name,
                 edition_permission= edition_permission,
                 date= date,
@@ -387,7 +413,7 @@ app = webapp2.WSGIApplication([
     webapp2.Route('/activate/<token_id>', ActivationPage),
     ('/users', UsersPage),
     ('/login', LoginPage),
-    ('/profile', ProfilePage),
+    webapp2.Route('/profile/<user_id>', ProfilePage),
     ('/logout', LogoutPage),
     # Features
     ('/map', MapPage),
