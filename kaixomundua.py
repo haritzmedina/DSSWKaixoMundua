@@ -451,13 +451,6 @@ class ActivationPage(session.BaseSessionHandler):
         self.response.write(template.render(error=errorMessage))
 
 
-# TODO Remove this class
-class TestPage(session.BaseSessionHandler):
-    def get(self):
-        photo = database.PhotosManager.get_photo_by_id(5004976929636352)
-        self.response.write(photo)
-
-
 class PhotoManagePage(session.BaseSessionHandler):
     def get(self, photo_id):
         # Session request handler
@@ -475,8 +468,33 @@ class PhotoManagePage(session.BaseSessionHandler):
         date = photo.date
         # Check if user can edit photo attributes
         edition_permission = (current_session.get_role_level() is 3) or (photo.owner == current_session.get_user_key())
-        # TODO Get visualizations and albums
+        # TODO Get albums which photo is belonged to
 
+        # Count photo visited by user
+        if current_session.get_id() is None:
+            database.PhotoViewManager.newView(photo, None)
+        else:
+            database.PhotoViewManager.newView(photo, current_session.user)
+
+        # TODO Photo visualization count
+        photo_views = database.PhotoViewManager.select_users_by_photo(photo)
+        views_counter = {}
+        for photo_view in photo_views:
+            if photo_view.user is None:
+                if "Anonymous" in views_counter:
+                    views_counter["Anonymous"]['count'] += 1
+                else:
+                    views_counter["Anonymous"] = {'count':1,
+                                                  'name':"Anonymous",
+                                                  'id': None}
+            else:
+                photo_view_user = photo_view.user
+                if photo_view_user.get().name in views_counter:
+                    views_counter[photo_view_user.get().name]['count'] += 1
+                else:
+                    views_counter[photo_view_user.get().name] = {'count':1,
+                                                                 'name':photo_view_user.get().name,
+                                                                 'id': photo_view_user.id()}
         # Response page
         self.response.write(template.render(
                 photo_id=photo_id,
@@ -484,13 +502,41 @@ class PhotoManagePage(session.BaseSessionHandler):
                 name=photo.name,
                 edition_permission= edition_permission,
                 date= date,
-                privacy=privacy))
+                privacy=privacy,
+                views=views_counter))
 
 
 # If a page does not exist, return to initial page
 class NotFoundPage(session.BaseSessionHandler):
     def get(self, args):
         self.redirect("/")
+
+
+# TODO Remove this class
+class TestPage(session.BaseSessionHandler):
+    def get(self):
+        photo = database.PhotosManager.get_photo_by_id(6068479551602688)
+        photo_views = database.PhotoViewManager.select_users_by_photo(photo)
+        views_counter = {}
+        for photo_view in photo_views:
+            if photo_view.user is None:
+                if "Anonymous" in views_counter:
+                    views_counter["Anonymous"]['count'] += 1
+                else:
+                    views_counter["Anonymous"] = {'count':1,
+                                                      'name':"Anonymous",
+                                                      'id': None}
+            else:
+                photo_view_user = photo_view.user
+                if photo_view_user.get().name in views_counter:
+                    views_counter[photo_view_user.get().name]['count'] += 1
+                else:
+                    views_counter[photo_view_user.get().name] = {'count':1,
+                                                                 'name':photo_view_user.get().name,
+                                                                 'id': photo_view_user.id()}
+
+        for key in views_counter:
+            self.response.write(views_counter[key]['name']+str(views_counter[key]['count']))
 
 
 app = webapp2.WSGIApplication([

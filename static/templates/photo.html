@@ -21,8 +21,8 @@
             <div id="date" class="infoboxElem"><label for="nameInput" class="label">{% trans %}
                 PhotoDoneIn{% endtrans %}</label>: <br/>{{ date }}</div>
             {% if session.get_id() != None %}
-                <div id="setAsBackground">{% trans %}SetAsBackground{% endtrans %}</div>
-                <div id="setAsProfilePhoto">{% trans %}SetAsProfilePhoto{% endtrans %}</div>
+                <a id="setAsBackground">{% trans %}SetAsBackground{% endtrans %}</a>
+                <a id="setAsProfilePhoto">{% trans %}SetAsProfilePhoto{% endtrans %}</a>
             {% endif %}
             {% if edition_permission %}
                 <div id="nameEditable" class="infoboxElem">
@@ -39,7 +39,17 @@
                             Private{% endtrans %}</option>
                     </select>
                 </div>
-                <div id="visualizations" class="infoboxElem"></div>
+                <div id="visualizations" class="infoboxElem">Visualizations:
+                {% for key in views %}
+                    <div class="visualizationUser">
+                        {% if views[key]['id'] is none %}
+                            {{ views[key]['name'] }}: {{ views[key]['count'] }}
+                        {% else %}
+                            <a href="/profile/{{ views[key]['id'] }}">{{ views[key]['name'] }}</a>: {{ views[key]['count'] }}
+                        {% endif %}
+                    </div>
+                {% endfor %}
+                </div>
                 <div id="delete" class="infoboxElem"><img src="/images/delete.png"></div>
             {% else %}
                 <div id="nameLabel" class="infoboxElem">{{ name }}</div>

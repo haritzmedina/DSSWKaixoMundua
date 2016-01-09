@@ -9,6 +9,7 @@ user_key = ndb.Key('User', 'default_user')
 photo_key = ndb.Key('Photo', 'default_photo')
 install_key = ndb.Key('Install', 'default_installation')
 token_key = ndb.Key('Token', 'default_token')
+photo_view_key = ndb.Key('PhotoView', 'default_photo_view')
 
 
 # Data model
@@ -46,15 +47,15 @@ class AlbumPhoto(ndb.Model):
     album = ndb.KeyProperty(kind=Album, repeated=True)
     photo = ndb.KeyProperty(kind=Photo, repeated=True)
 
-
+# Permissions for user visualization on a photo (explicit set by user)
 class PhotoUserVisualization(ndb.Model):
     photo = ndb.KeyProperty(kind=Photo, repeated=True)
     user = ndb.KeyProperty(kind=User, repeated=True)
 
-
-class PhotoViews(ndb.Model):
-    user = ndb.TextProperty(indexed=True)
-    photo = ndb.TextProperty(indexed=True)
+# Number of views of a photo
+class PhotoView(ndb.Model):
+    user = ndb.KeyProperty(kind=User, indexed=True)
+    photo = ndb.KeyProperty(kind=Photo, indexed=True)
 
 
 class Install(ndb.Model):
@@ -259,3 +260,29 @@ class PhotosManager:
         # Remove photo
         photo.key.delete()
 
+class PhotoViewManager:
+    def __init__(self):
+        pass
+
+    @staticmethod
+    def newView(photo, user=None):
+        photo_view = PhotoView(parent=photo_view_key)
+
+        photo_view.photo = photo.key
+        if user is None:
+            photo_view.user = None
+        else:
+            photo_view.user = user.key
+
+        photo_view.put()
+
+    @staticmethod
+    def select_users_by_photo(photo):
+        photos = ndb.gql(
+                'SELECT user '
+                'FROM PhotoView '
+                'WHERE photo = :1 '
+                'ORDER BY user ASC',
+                photo.key
+        )
+        return photos

@@ -42,7 +42,7 @@
             var photo_id = document.getElementById('photo').dataset.photoId;
             var user_id = document.getElementById("userinfo").dataset.userId;
             $.post("/api/user/"+user_id+"/changeUserData/", {background: photo_id}, function(data){
-                console.log(data);
+                window.location.reload(false);
             })
         }
     }

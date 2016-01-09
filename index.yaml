@@ -27,6 +27,11 @@ indexes:
   - name: date
     direction: desc
 
+- kind: PhotoView
+  properties:
+  - name: photo
+  - name: user
+
 - kind: User
   properties:
   - name: email

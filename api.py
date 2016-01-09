@@ -143,7 +143,7 @@ class ApiPhotoDownload(session.BlobDownloadSessionHandler):
         elif not blobstore_2.get(photo.image):
             self.response.write("No blob")
         else:
-            # TODO Count photo visited by user
+            # Response photo blob
             self.send_blob(photo.image)
 
 
@@ -380,7 +380,7 @@ class ApiPhotosManager(session.BaseSessionHandler):
             data += ']}'
             result = "OK"
         else:
-            # TODO print method not allowed
+            # Print method not allowed
             data = '{"error": "Method not allowed"}'
             result = "FAIL"
         self.response.write(template.render(feature="user", data=data, query=self.request.query_string, result=result))
