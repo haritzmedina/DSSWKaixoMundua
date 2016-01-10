@@ -14,6 +14,8 @@ photo_user_permission_key = ndb.Key('PhotoUserPermission', 'default_photo_user_p
 
 
 # Data model
+
+# User model
 class User(ndb.Model):
     name = ndb.TextProperty(indexed=True)
     password = ndb.TextProperty()
@@ -25,12 +27,14 @@ class User(ndb.Model):
     attempts = ndb.IntegerProperty()  # Number of attempts before blocking the account
 
 
+# Token model
 class Token(ndb.Model):
     user = ndb.KeyProperty(kind=User, indexed=True)
     date = ndb.DateTimeProperty(auto_now_add=True)
     used = ndb.BooleanProperty(default=False)
 
 
+# Photo model
 class Photo(ndb.Model):
     owner = ndb.KeyProperty(kind=User, indexed=True)
     privacy = ndb.IntegerProperty(indexed=True) # 0 public, 1 selectedUsers, 2 private
@@ -39,26 +43,28 @@ class Photo(ndb.Model):
     image = ndb.BlobKeyProperty()
 
 
+# Album model
 class Album(ndb.Model):
     owner = ndb.KeyProperty(kind=User, repeated=True)
     name = ndb.TextProperty(indexed=True)
 
 
+# Relation between Album and Photo
 class AlbumPhoto(ndb.Model):
     album = ndb.KeyProperty(kind=Album, repeated=True)
     photo = ndb.KeyProperty(kind=Photo, repeated=True)
 
-# Permissions for user visualization on a photo (explicit set by user)
+# Relation between User and Photo, a entity refers to a User has permission to watch a Photo
 class PhotoUserPermission(ndb.Model):
     photo = ndb.KeyProperty(kind=Photo, indexed=True)
     user = ndb.KeyProperty(kind=User, indexed=True)
 
-# Number of views of a photo
+# Relation between User and Photo, a entity refers to a User has seen a Photo
 class PhotoView(ndb.Model):
     user = ndb.KeyProperty(kind=User, indexed=True)
     photo = ndb.KeyProperty(kind=Photo, indexed=True)
 
-
+# Save if service is correctly installed (admin account is created)
 class Install(ndb.Model):
     installed = ndb.BooleanProperty()
 
