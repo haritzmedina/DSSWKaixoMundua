@@ -9,14 +9,15 @@
                 KaixoMundua.utils.okayResponseBox(document.getElementById("username"));
                 KaixoMundua.utils.okayResponseBox(document.getElementById("email"));
             }
-        });
+        },
+        "json");
     }
 
     function requestProfileChange(){
         var user_id = document.getElementById("userinfo").dataset.userId;
         var emailSendMessage = document.getElementById('trans').dataset.emailSend;
 
-        $.get("/api/user/"+user_id+"/profileChangeRequest/",{}, function(data){
+        $.getJSON("/api/user/"+user_id+"/profileChangeRequest/",{}, function(data){
             if(data.result=="OK"){
                 alert(emailSendMessage);
             }

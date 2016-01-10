@@ -31,6 +31,8 @@ from google.appengine.api.blobstore import blobstore
 from google.appengine.ext import vendor
 
 # Add language compatibility
+import security
+
 vendor.add('lib')
 from webapp2_extras import i18n
 from webapp2_extras.i18n import gettext as _
@@ -346,14 +348,22 @@ class ProfilePage(session.BaseSessionHandler):
 
         # Retrieved user_id to integer
         user_id = int(user_id)
-
+        # Retrieve user data
         user = database.UserManager.select_by_id(user_id)
-
-        # TODO Retrieve album and send to template
+        # Check if user can see the profile photo
+        profilePhoto = database.PhotosManager.get_photo_by_id(int(user.photo))
+        if current_session.get_id() is None:
+            profilePhotoAllowed = False
+        else:
+            requestUser = database.UserManager.select_by_id(current_session.get_id())
+            if security.PhotoSecurity.user_is_allowed_to_watch_photo(profilePhoto, requestUser):
+                profilePhotoAllowed = True
+            else:
+                profilePhotoAllowed = False
 
         # Prompt page
         template = JINJA_ENVIRONMENT.get_template('static/templates/profile.html')
-        self.response.write(template.render(user=user))
+        self.response.write(template.render(user=user, profilePhotoAllowed=profilePhotoAllowed))
 
 
 class LogoutPage(session.BaseSessionHandler):
@@ -363,7 +373,9 @@ class LogoutPage(session.BaseSessionHandler):
         JINJA_ENVIRONMENT.globals['session'] = current_session
         # Language request handler
         Language.language(self)
-        # TODO Check if user has session started
+        # Check if user has session started
+        if current_session.get_id() is None:
+            self.redirect("/")
         # Logout user
         current_session.logout(self)
         # Prompt logout page
@@ -468,7 +480,14 @@ class PhotoManagePage(session.BaseSessionHandler):
         date = photo.date
         # Check if user can edit photo attributes
         edition_permission = (current_session.get_role_level() is 3) or (photo.owner == current_session.get_user_key())
-        # TODO Get albums which photo is belonged to
+
+        # Get user allowed to watch photo
+        if privacy == 1:
+            allowed_users = database.PhotoUserPermissionManager.get_allowed_users_by_photo(photo)
+        else:
+            allowed_users = None
+
+
 
         # Count photo visited by user
         if current_session.get_id() is None:
@@ -476,7 +495,7 @@ class PhotoManagePage(session.BaseSessionHandler):
         else:
             database.PhotoViewManager.newView(photo, current_session.user)
 
-        # TODO Photo visualization count
+        # Photo visualization count
         photo_views = database.PhotoViewManager.select_users_by_photo(photo)
         views_counter = {}
         for photo_view in photo_views:
@@ -497,13 +516,16 @@ class PhotoManagePage(session.BaseSessionHandler):
                                                                  'id': photo_view_user.id()}
         # Response page
         self.response.write(template.render(
-                photo_id=photo_id,
-                owner=user,
-                name=photo.name,
-                edition_permission= edition_permission,
-                date= date,
-                privacy=privacy,
-                views=views_counter))
+            photo_id=photo_id,
+            owner=user,
+            name=photo.name,
+            edition_permission= edition_permission,
+            date= date,
+            privacy=privacy,
+            views=views_counter,
+            every_user_list=database.UserManager.select(),
+            allowed_users=allowed_users
+        ))
 
 
 # If a page does not exist, return to initial page
@@ -515,28 +537,17 @@ class NotFoundPage(session.BaseSessionHandler):
 # TODO Remove this class
 class TestPage(session.BaseSessionHandler):
     def get(self):
-        photo = database.PhotosManager.get_photo_by_id(6068479551602688)
-        photo_views = database.PhotoViewManager.select_users_by_photo(photo)
-        views_counter = {}
-        for photo_view in photo_views:
-            if photo_view.user is None:
-                if "Anonymous" in views_counter:
-                    views_counter["Anonymous"]['count'] += 1
-                else:
-                    views_counter["Anonymous"] = {'count':1,
-                                                      'name':"Anonymous",
-                                                      'id': None}
-            else:
-                photo_view_user = photo_view.user
-                if photo_view_user.get().name in views_counter:
-                    views_counter[photo_view_user.get().name]['count'] += 1
-                else:
-                    views_counter[photo_view_user.get().name] = {'count':1,
-                                                                 'name':photo_view_user.get().name,
-                                                                 'id': photo_view_user.id()}
+        photo = database.PhotosManager.get_photo_by_id(5100909319159808)
+        #user = database.UserManager.select_by_id(5681726336532480)
+        user = database.UserManager.select_by_id(5629499534213120)
 
-        for key in views_counter:
-            self.response.write(views_counter[key]['name']+str(views_counter[key]['count']))
+        database.PhotoUserPermissionManager.give_permission(photo, user)
+
+        allowed_users = database.PhotoUserPermissionManager.get_allowed_users_by_photo(photo)
+
+        for allowed_user in allowed_users:
+            self.response.write(allowed_user.user.get().name)
+
 
 
 app = webapp2.WSGIApplication([
@@ -558,6 +569,7 @@ app = webapp2.WSGIApplication([
     webapp2.Route('/photo/<photo_id>', PhotoManagePage),
     # Photos AJAX functions
     webapp2.Route('/api/photos/manage/<option>', api.ApiPhotosManager),
+    webapp2.Route('/api/photos/permission/<photo_id>/<user_id>/<option>', api.ApiPhotoUserPermission),
     ('/api/photos/upload/path', api.ApiPhotosUploadPath),
     ('/api/photos/upload', api.ApiPhotosUpload),
     webapp2.Route('/api/photo/download/<photo_id>', api.ApiPhotoDownload),

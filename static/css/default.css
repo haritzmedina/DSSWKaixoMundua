@@ -96,6 +96,10 @@ a{
     cursor: pointer;
 }
 
+.clickable{
+
+}
+
 #errorMessage{
     color: rgba(230,100,100,1);
     font-size: large;
@@ -105,4 +109,12 @@ a{
     min-height: 20px;
     padding: 15px;
     border-radius: 7px;
+}
+
+#logoutTab{
+    background-color:rgba(150,0,0,0.8);
+}
+
+#logoutTab:hover{
+    background-color:rgba(150,0,0,1);
 }

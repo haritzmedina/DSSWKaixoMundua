@@ -35,6 +35,7 @@
             // Create link
             var link = document.createElement('a');
             link.href = "/photo/"+photo_id;
+            link.classList.add("photoLink")
             // Create div
             var div = document.createElement('div');
             div.classList.add("imageRectangle");

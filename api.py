@@ -13,6 +13,8 @@ from session import SessionManager as Session
 # Email handler
 import email_handler
 
+import security
+
 # Blobstore
 from google.appengine.api.blobstore import blobstore
 from google.appengine.ext import blobstore as blobstore_2
@@ -49,7 +51,7 @@ class ApiRegister(session.BaseSessionHandler):
             result = "FAIL"
         self.response.write(template.render(feature="register",
                                             data=data,
-                                            query=self.request.query_string,
+                                            query=self.request.url,
                                             result=result))
 
 
@@ -83,7 +85,7 @@ class ApiMap(session.BaseSessionHandler):
             # Write response
             self.response.write(template.render(feature="map",
                                                 data=data,
-                                                query=self.request.query_string,
+                                                query=self.request.url,
                                                 result=result))
 
 
@@ -94,6 +96,11 @@ class ApiPhotosUpload(session.BlobUploadSessionHandler):
         self.response.headers['Content-Type'] = 'application/json'
         # Session request handler
         current_session = Session(self)
+
+        # Retrieve uploaded info
+        upload_files = self.get_uploads("file")
+        blob_info = upload_files[0]
+
         # Check if user can upload the photo
         if current_session.get_role_level() < 2:
             self.response.headers['Content-Type'] = 'application/json'
@@ -101,19 +108,18 @@ class ApiPhotosUpload(session.BlobUploadSessionHandler):
             result = "FAIL"
             self.response.write(template.render(feature="photo",
                                                 data=data,
-                                                query=self.request.query_string,
+                                                query=self.request.url,
                                                 result=result))
-            # TODO remove photo from blob store
+            # Remove photo from blob store
+            blobstore.delete(blob_info.key)
             return None
-        # Retrieve uploaded info
-        upload_files = self.get_uploads("file")
-        blob_info = upload_files[0]
+
         # Save photo to database
         photo_id = database.PhotosManager.createPhoto("", current_session.get_user_key(), 2, blob_info.key())
         # Prompt response to user
         data = '{"photo_id": ' + str(photo_id) + '}'
         result = "OK"
-        self.response.write(template.render(feature="photo", data=data, query=self.request.query_string, result=result))
+        self.response.write(template.render(feature="photo", data=data, query=self.request.url, result=result))
 
 
 class ApiPhotosUploadPath(session.BlobUploadSessionHandler):
@@ -124,7 +130,7 @@ class ApiPhotosUploadPath(session.BlobUploadSessionHandler):
         # Retrieve a new session path to upload
         upload_url = blobstore.create_upload_url('/api/photos/upload')
         data = '{"url": "' + upload_url + '"}'
-        self.response.write(template.render(feature="photo", data=data, query=self.request.query_string, result="OK"))
+        self.response.write(template.render(feature="photo", data=data, query=self.request.url, result="OK"))
 
 
 class ApiPhotoDownload(session.BlobDownloadSessionHandler):
@@ -134,17 +140,20 @@ class ApiPhotoDownload(session.BlobDownloadSessionHandler):
         # Load response template
         template = JINJA_ENVIRONMENT.get_template('static/templates/api.json')
 
-        # TODO Check visualization permissions to current user
-
         # Retrieve photo url for photo_id
         photo = database.PhotosManager.get_photo_by_id(int(photo_id))
+        user = database.UserManager.select_by_id(current_session.get_id())
+
         if not photo:
             self.response.write("No photo")
         elif not blobstore_2.get(photo.image):
             self.response.write("No blob")
         else:
-            # Response photo blob
-            self.send_blob(photo.image)
+            # Check visualization permissions to current user
+            if security.PhotoSecurity.user_is_allowed_to_watch_photo(photo, user):
+                self.send_blob(photo.image)
+            else:
+                self.error(404)
 
 
 class ApiUserManagement(session.BaseSessionHandler):
@@ -162,7 +171,7 @@ class ApiUserManagement(session.BaseSessionHandler):
             result = "FAIL"
             self.response.write(template.render(feature="user",
                                                 data=data,
-                                                query=self.request.query_string,
+                                                query=self.request.url,
                                                 result=result))
             return None
         # Check if user exists
@@ -173,7 +182,7 @@ class ApiUserManagement(session.BaseSessionHandler):
             result = "FAIL"
             self.response.write(template.render(feature="user",
                                                 data=data,
-                                                query=self.request.query_string,
+                                                query=self.request.url,
                                                 result=result))
             return None
 
@@ -191,7 +200,7 @@ class ApiUserManagement(session.BaseSessionHandler):
                 else:
                     data = '{"error": "Field exists", "field": "email"}'
                     result = "FAIL"
-                    self.response.write(template.render(feature="user", data=data, query=self.request.query_string, result=result))
+                    self.response.write(template.render(feature="user", data=data, query=self.request.url, result=result))
 
             if username is not None:
                 userbyname = database.UserManager.select_by_username(username)
@@ -200,7 +209,7 @@ class ApiUserManagement(session.BaseSessionHandler):
                 else:
                     data = '{"error": "Field exists", "field": "username"}'
                     result = "FAIL"
-                    self.response.write(template.render(feature="user", data=data, query=self.request.query_string, result=result))
+                    self.response.write(template.render(feature="user", data=data, query=self.request.url, result=result))
             if background is not None:
                 # Check if photo exists
                 background_photo = database.PhotosManager.get_photo_by_id(int(background))
@@ -210,7 +219,7 @@ class ApiUserManagement(session.BaseSessionHandler):
                 else:
                     data = '{"error": "Field not exists", "field": "background"}'
                     result = "FAIL"
-                    self.response.write(template.render(feature="user", data=data, query=self.request.query_string, result=result))
+                    self.response.write(template.render(feature="user", data=data, query=self.request.url, result=result))
             if photo_id is not None:
                 # Check if photo exists
                 photo = database.PhotosManager.get_photo_by_id(int(photo_id))
@@ -220,10 +229,10 @@ class ApiUserManagement(session.BaseSessionHandler):
                 else:
                     data = '{"error": "Field not exists", "field": "background"}'
                     result = "FAIL"
-                    self.response.write(template.render(feature="user", data=data, query=self.request.query_string, result=result))
+                    self.response.write(template.render(feature="user", data=data, query=self.request.url, result=result))
             data = '{"message": "User updated"}'
             result = "OK"
-            self.response.write(template.render(feature="user", data=data, query=self.request.query_string, result=result))
+            self.response.write(template.render(feature="user", data=data, query=self.request.url, result=result))
 
     def get(self, user_id, option):
         # Session
@@ -239,7 +248,7 @@ class ApiUserManagement(session.BaseSessionHandler):
             result = "FAIL"
             self.response.write(template.render(feature="user",
                                                 data=data,
-                                                query=self.request.query_string,
+                                                query=self.request.url,
                                                 result=result))
             return None
         # Check if user exists
@@ -250,7 +259,7 @@ class ApiUserManagement(session.BaseSessionHandler):
             result = "FAIL"
             self.response.write(template.render(feature="user",
                                                 data=data,
-                                                query=self.request.query_string,
+                                                query=self.request.url,
                                                 result=result))
             return None
 
@@ -262,7 +271,7 @@ class ApiUserManagement(session.BaseSessionHandler):
                 result = "FAIL"
                 self.response.write(template.render(feature="user",
                                                     data=data,
-                                                    query=self.request.query_string,
+                                                    query=self.request.url,
                                                     result=result))
                 return None
             # If user has not his account activated, admin cannot active it
@@ -271,7 +280,7 @@ class ApiUserManagement(session.BaseSessionHandler):
                 result = "FAIL"
                 self.response.write(template.render(feature="user",
                                                     data=data,
-                                                    query=self.request.query_string,
+                                                    query=self.request.url,
                                                     result=result))
                 return None
             # Activate account by admin
@@ -285,7 +294,7 @@ class ApiUserManagement(session.BaseSessionHandler):
                 result = "FAIL"
                 self.response.write(template.render(feature="user",
                                                     data=data,
-                                                    query=self.request.query_string,
+                                                    query=self.request.url,
                                                     result=result))
                 return None
             # If user has not his account activated, admin cannot active it
@@ -294,7 +303,7 @@ class ApiUserManagement(session.BaseSessionHandler):
                 result = "FAIL"
                 self.response.write(template.render(feature="user",
                                                     data=data,
-                                                    query=self.request.query_string,
+                                                    query=self.request.url,
                                                     result=result))
                 return None
             # Activate account by admin
@@ -308,7 +317,7 @@ class ApiUserManagement(session.BaseSessionHandler):
                 result = "FAIL"
                 self.response.write(template.render(feature="user",
                                                 data=data,
-                                                query=self.request.query_string,
+                                                query=self.request.url,
                                                 result=result))
                 return None
             database.UserManager.modify_user(user.key, attempts=3)  # Account is blocked with 3 attempts
@@ -321,7 +330,7 @@ class ApiUserManagement(session.BaseSessionHandler):
                 result = "FAIL"
                 self.response.write(template.render(feature="user",
                                                     data=data,
-                                                    query=self.request.query_string,
+                                                    query=self.request.url,
                                                     result=result))
                 return None
             database.UserManager.modify_user(user.key, attempts=0)  # Account is unblocked with 0 attempts
@@ -337,7 +346,7 @@ class ApiUserManagement(session.BaseSessionHandler):
         else:
             data = '{"error": "Method not allowed"}'
             result = "FAIL"
-        self.response.write(template.render(feature="user", data=data, query=self.request.query_string, result=result))
+        self.response.write(template.render(feature="user", data=data, query=self.request.url, result=result))
 
 
 class ApiUserRecover(session.BaseSessionHandler):
@@ -355,7 +364,7 @@ class ApiUserRecover(session.BaseSessionHandler):
         else:
             data = '{"error": "User not exists"}'
             result = "ERROR"
-        self.response.write(template.render(feature="user", data=data, query=self.request.query_string, result=result))
+        self.response.write(template.render(feature="user", data=data, query=self.request.url, result=result))
 
 class ApiPhotosManager(session.BaseSessionHandler):
     def get(self, option):
@@ -366,24 +375,29 @@ class ApiPhotosManager(session.BaseSessionHandler):
         self.response.headers['Content-Type'] = 'application/json'
 
         if option == "list":
-            # TODO List all accesible photos
+            # List all accesible photos
             photos = database.PhotosManager.retrieveAllPhotos()
+            user = database.UserManager.select_by_id(current_session.get_id())
             data = '{"photos":['
+            isAnyPhotoAllowed = False
             for photo in photos:
-                id = photo.key.id()
-                username = photo.owner.get().name
-                date = photo.date
-                name = photo.name
-                data += '{"photo_id": ' + str(id) + ', "username": "' + username + '", "date": "' + str(
-                    date) + '", "name": "' + name + '"},'
-            data = data[:-1]
+                if security.PhotoSecurity.user_is_allowed_to_watch_photo(photo, user):  # Check user has permission to retrieve
+                    isAnyPhotoAllowed = True
+                    id = photo.key.id()
+                    username = photo.owner.get().name
+                    date = photo.date
+                    name = photo.name
+                    data += '{"photo_id": ' + str(id) + ', "username": "' + username + '", "date": "' + str(
+                        date) + '", "name": "' + name + '"},'
+            if isAnyPhotoAllowed:
+                data = data[:-1]
             data += ']}'
             result = "OK"
         else:
             # Print method not allowed
             data = '{"error": "Method not allowed"}'
             result = "FAIL"
-        self.response.write(template.render(feature="user", data=data, query=self.request.query_string, result=result))
+        self.response.write(template.render(feature="user", data=data, query=self.request.url, result=result))
 
 
 class ApiPhotoModify(session.BaseSessionHandler):
@@ -411,7 +425,7 @@ class ApiPhotoModify(session.BaseSessionHandler):
                 data = '{"error": "No permission to change."}'
                 result = "FAIL"
         # Response result json
-        self.response.write(template.render(feature="user", data=data, query=self.request.query_string, result=result))
+        self.response.write(template.render(feature="user", data=data, query=self.request.url, result=result))
 
 
 class ApiPhotoDelete(session.BaseSessionHandler):
@@ -438,6 +452,49 @@ class ApiPhotoDelete(session.BaseSessionHandler):
                 result = "FAIL"
 
         # Response result json
-        self.response.write(template.render(feature="user", data=data, query=self.request.query_string, result=result))
+        self.response.write(template.render(feature="user", data=data, query=self.request.url, result=result))
 
 
+class ApiPhotoUserPermission(session.BaseSessionHandler):
+    def get(self, user_id, photo_id, option):
+        # Session
+        current_session = Session(self)
+        # Load response template
+        template = JINJA_ENVIRONMENT.get_template('static/templates/api.json')
+        self.response.headers['Content-Type'] = 'application/json'
+
+        # Check if user and photo exists
+        photo = database.PhotosManager.get_photo_by_id(int(photo_id))
+        user = database.UserManager.select_by_id(int(user_id))
+
+        if photo is None:
+            data = '{"error": "Photo does not exist."}'
+            result = "FAIL"
+        elif user is None:
+            data = '{"error": "User does not exist."}'
+            result = "FAIL"
+        else:
+            # Check permission for this petition (only owner or admin can modify)
+            if(photo.owner == current_session.get_user_key()) or (current_session.get_role_level() > 2):
+                if option == "give":
+                    result = database.PhotoUserPermissionManager.give_permission(photo, user)
+                    if result is None:
+                        data = '{"error": "Permission already set."}'
+                        result = "FAIL"
+                    else:
+                        data = '{"message": "Permission allowed."}'
+                        result = "OK"
+                elif option == "restrict":
+                    result = database.PhotoUserPermissionManager.restrict_permission(photo, user)
+                    if result is True:
+                        data = '{"message": "Permission restricted."}'
+                        result = "OK"
+                    else:
+                        data = '{"error": "Permission is not set. Cannot restrict"}'
+                        result = "FAIL"
+            else:
+                data = '{"error": "Permission denied. Operation cannot do."}'
+                result = "FAIL"
+
+        # Response result json
+        self.response.write(template.render(feature="user", data=data, query=self.request.url, result=result))

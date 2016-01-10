@@ -9,6 +9,10 @@
     padding-bottom: 15px;
 }
 
+#photosContainer{
+    margin-top:20px
+}
+
 #photo-dropzone:hover{
     background-color : rgba(170,170,240,0.8);
 }
@@ -39,4 +43,8 @@
 
 .imageRectangle:hover{
     background-color: rgba(50,50,50,0.8);
+}
+
+#photosContainer a{
+    display:inline-block;
 }

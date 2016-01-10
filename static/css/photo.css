@@ -1,7 +1,6 @@
 #photoContainer{
     min-width:750px;
     height: 600px;
-    max-height: 500px;
 }
 
 #photo{
@@ -42,12 +41,54 @@
     width: 170px;
 }
 
+#delete{
+    width: 50px;
+    cursor: pointer;
+}
+
 #delete > img{
     width: 50px;
 }
 
-#privacySelector{
+.selector{
     height:50px;
     font-size: large;
-    width: 170px;
+    width: 150px;
+    margin-right: 10px;
+    float:left;
+}
+
+#privacySelector{
+    float: none;
+}
+
+#restrictedUserAdder{
+    width:50px;
+    background-color: rgba(50,140,50,0.8);
+    border-radius: 25px;
+    cursor: pointer;
+}
+
+#restrictedUserAdder:hover{
+    background-color: rgba(50,170,50,1);
+}
+
+.restrictedUserRemover{
+    width:25px;
+    border-radius: 12px;
+    background-color: rgba(140,50,50,0.8);
+    cursor: pointer;
+}
+
+.restrictedUserRemover:hover{
+    background-color: rgba(170,50,50,1);
+}
+
+#restrictedUserBox{
+    /* By default this panel will be hidden, but if "restricted users" privacy level is set, it will be shown*/
+    display: none;
+}
+
+#nameLabel{
+    font-size: larger;
 }

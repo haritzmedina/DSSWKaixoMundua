@@ -11,7 +11,7 @@
 {% block content %}
     <div id="infobox">
     <div id="profilePhoto">
-        {% if user.photo != None %}
+        {% if user.photo != None and profilePhotoAllowed %}
         <img src="/api/photo/download/{{ user.photo }}"/>
         {% else %}
         <img src="/images/anonymous.png"/>

@@ -10,6 +10,7 @@ photo_key = ndb.Key('Photo', 'default_photo')
 install_key = ndb.Key('Install', 'default_installation')
 token_key = ndb.Key('Token', 'default_token')
 photo_view_key = ndb.Key('PhotoView', 'default_photo_view')
+photo_user_permission_key = ndb.Key('PhotoUserPermission', 'default_photo_user_permission')
 
 
 # Data model
@@ -48,9 +49,9 @@ class AlbumPhoto(ndb.Model):
     photo = ndb.KeyProperty(kind=Photo, repeated=True)
 
 # Permissions for user visualization on a photo (explicit set by user)
-class PhotoUserVisualization(ndb.Model):
-    photo = ndb.KeyProperty(kind=Photo, repeated=True)
-    user = ndb.KeyProperty(kind=User, repeated=True)
+class PhotoUserPermission(ndb.Model):
+    photo = ndb.KeyProperty(kind=Photo, indexed=True)
+    user = ndb.KeyProperty(kind=User, indexed=True)
 
 # Number of views of a photo
 class PhotoView(ndb.Model):
@@ -260,6 +261,7 @@ class PhotosManager:
         # Remove photo
         photo.key.delete()
 
+
 class PhotoViewManager:
     def __init__(self):
         pass
@@ -278,11 +280,65 @@ class PhotoViewManager:
 
     @staticmethod
     def select_users_by_photo(photo):
-        photos = ndb.gql(
+        users = ndb.gql(
                 'SELECT user '
                 'FROM PhotoView '
                 'WHERE photo = :1 '
                 'ORDER BY user ASC',
                 photo.key
         )
-        return photos
+        return users
+
+
+class PhotoUserPermissionManager:
+    def __init__(self):
+        pass
+
+    @staticmethod
+    def give_permission(photo, user):
+
+        # Check if permission already exists
+        permission = PhotoUserPermissionManager.get_user_photo_pair(photo, user)
+        if permission is not None:
+            return None  # Do anything if permission is already set
+
+        # Create new permission
+        photo_user_permission = PhotoUserPermission(parent=photo_user_permission_key)
+        photo_user_permission.photo = photo.key
+        photo_user_permission.user = user.key
+
+        key = photo_user_permission.put()
+
+        return key
+
+    @staticmethod
+    def restrict_permission(photo, user):
+        permission = PhotoUserPermissionManager.get_user_photo_pair(photo, user)
+        # Remove permission if exists
+        if permission is not None:
+            permission.key.delete()
+            return True
+        return False
+
+    @staticmethod
+    def get_user_photo_pair(photo, user):
+        user_photo_permission = ndb.gql(
+                'SELECT * '
+                'FROM PhotoUserPermission '
+                'WHERE photo = :1 AND user = :2',
+                photo.key, user.key
+        )
+        return user_photo_permission.get()
+
+    @staticmethod
+    def get_allowed_users_by_photo(photo):
+        photokey = photo.key
+
+        users = ndb.gql(
+                'SELECT * '
+                'FROM PhotoUserPermission '
+                'WHERE photo = :1 '
+                'ORDER BY user ASC',
+                photokey
+        )
+        return users
