@@ -16,8 +16,8 @@
             });
         }
     });
-
     window.onload = function(){
         initMap(43.3183564,-1.981307);
     };
+
 })();
