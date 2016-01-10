@@ -12,10 +12,10 @@ class PhotoSecurity:
             if user.role_level > 2:  # Request user is admin
                 return True
             else:
-                if user.role_level == 2:  # User account is activated by admin
-                    if photo.privacy == 0:  # Photo is public
-                        return True
-                    elif photo.privacy == 1:  # Photo is restricted
+                if photo.privacy == 0:  # Photo is public
+                    return True
+                elif photo.privacy == 1:  # Photo is restricted
+                    if user.role_level == 2:  # User account is activated by admin
                         permission = database.PhotoUserPermissionManager.get_user_photo_pair(photo, user)
                         if permission is not None:  # Owner has given permission to request user
                             return True

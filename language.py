@@ -20,7 +20,7 @@ class Language:
             currentLang = newLang
         else:
             if cookieLang is None or len(cookieLang) < 1:
-                currentLang = 'eu_ES'
+                currentLang = 'en_US'
             else:
                 currentLang = cookieLang
         http.response.set_cookie('language', currentLang, max_age=15724800) # 26 weeks in seconds
