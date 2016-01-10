@@ -351,15 +351,18 @@ class ProfilePage(session.BaseSessionHandler):
         # Retrieve user data
         user = database.UserManager.select_by_id(user_id)
         # Check if user can see the profile photo
-        profilePhoto = database.PhotosManager.get_photo_by_id(int(user.photo))
-        if current_session.get_id() is None:
-            profilePhotoAllowed = False
-        else:
-            requestUser = database.UserManager.select_by_id(current_session.get_id())
-            if security.PhotoSecurity.user_is_allowed_to_watch_photo(profilePhoto, requestUser):
-                profilePhotoAllowed = True
-            else:
+        if user.photo is not None:
+            profilePhoto = database.PhotosManager.get_photo_by_id(int(user.photo))
+            if current_session.get_id() is None:
                 profilePhotoAllowed = False
+            else:
+                requestUser = database.UserManager.select_by_id(current_session.get_id())
+                if security.PhotoSecurity.user_is_allowed_to_watch_photo(profilePhoto, requestUser):
+                    profilePhotoAllowed = True
+                else:
+                    profilePhotoAllowed = False
+        else:
+            profilePhotoAllowed = False
 
         # Prompt page
         template = JINJA_ENVIRONMENT.get_template('static/templates/profile.html')

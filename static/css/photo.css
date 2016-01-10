@@ -92,3 +92,7 @@
 #nameLabel{
     font-size: larger;
 }
+
+.hoverableAction:hover{
+    color: rgba(0,0,0,1);
+}

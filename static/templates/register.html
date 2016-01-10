@@ -14,13 +14,12 @@
     <div id="errorMessage">{% if error %}
         {% trans %}Error{% endtrans %}: {{ error }}
         {% endif %}</div>
-    <div id="note">*{% trans %}ChangePasswordNeedsConfirmation{% endtrans %}</div>
     <form id="register" method="post" action="/register">
         <div><input type="text" id="username" name="username" required="required" placeholder="{% trans %}Username{% endtrans %}" class="formBox"/></div>
         <div><input type="password" id="password1" name="password1" pattern=".{6,}" required="required"  placeholder="{% trans %}Password{% endtrans %}" class="formBox" autocomplete="off"/></div>
         <div><input type="password" id="password2" name="password2" pattern=".{6,}" required="required" placeholder="{% trans %}PasswordRepeat{% endtrans %}" class="formBox" autocomplete="off"/></div>
         <div><input type="email" id="email" name="email" required="required" placeholder="{% trans %}Email{% endtrans %}" class="formBox"/></div>
-        <div><input type="submit" id="submit" required="required" value="{% trans %}UpdateProfile{% endtrans %}"/></div>
+        <div><input type="submit" id="submit" required="required" value="{% trans %}Register{% endtrans %}"/></div>
     </form>
 </div>
 {% endblock %}

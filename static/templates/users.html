@@ -46,9 +46,12 @@
     </div>
     <div class="dataCell cell">
         <input type="checkbox" class="blocked checkbox"
-               {%if user.attempts == 3 %}
+                {% if user.attempts == 3 %}
                checked="checked"
-               {% endif %}
+                {% endif %}
+                {% if user.role_level == 3 %}
+               disabled="disabled"
+                {% endif %}
         />
     </div>
 </div>

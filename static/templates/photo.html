@@ -23,12 +23,15 @@
                 </div>
                 <div id="privacy" class="infoboxElem">
                     <select id="privacySelector" class="selector">
-                        <option value="0"{% if privacy == 0 %} selected="selected"{% endif %}>{% trans %}
-                            Public{% endtrans %}</option>
-                        <option value="1"{% if privacy == 1 %} selected="selected"{% endif %}>{% trans %}
-                            RestrictedUsers{% endtrans %}</option>
-                        <option value="2"{% if privacy == 2 %} selected="selected"{% endif %}>{% trans %}
-                            Private{% endtrans %}</option>
+                        <option value="0"{% if privacy == 0 %} selected="selected"{% endif %}>
+                            {% trans %}Public{% endtrans %}
+                        </option>
+                        <option value="1"{% if privacy == 1 %} selected="selected"{% endif %}>
+                            {% trans %}RestrictedUsers{% endtrans %}
+                        </option>
+                        <option value="2"{% if privacy == 2 %} selected="selected"{% endif %}>
+                            {% trans %}Private{% endtrans %}
+                        </option>
                     </select>
                     <div id="restrictedUserBox">
                         <select id="restrictedUserSelector" class="selector">
@@ -65,13 +68,15 @@
                 <div id="nameLabel" class="infoboxElem">{{ name }}</div>
                 <div id="albums" class="infoboxElem"></div>
             {% endif %}
-            <div id="owner" class="infoboxElem"><label for="nameInput" class="label">{% trans %}
-                PhotoDoneBy{% endtrans %}</label>: <br/><a href="/profile/{{ owner.key.id() }}">{{ owner.name }}</a></div>
-            <div id="date" class="infoboxElem"><label for="nameInput" class="label">{% trans %}
-                PhotoDoneIn{% endtrans %}</label>: <br/>{{ date }}</div>
+            <div id="owner" class="infoboxElem">
+                <label for="nameInput" class="label">{% trans %}PhotoDoneBy{% endtrans %}</label>:
+                <br/><a href="/profile/{{ owner.key.id() }}">{{ owner.name }}</a></div>
+            <div id="date" class="infoboxElem">
+                <label for="nameInput" class="label">{% trans %}PhotoDoneIn{% endtrans %}</label>:
+                <br/>{{ date }}</div>
             {% if session.get_id() != None %}
-                <a id="setAsBackground">{% trans %}SetAsBackground{% endtrans %}</a>
-                <a id="setAsProfilePhoto">{% trans %}SetAsProfilePhoto{% endtrans %}</a>
+                <a id="setAsBackground" class="hoverableAction">{% trans %}SetAsBackground{% endtrans %}</a>
+                <a id="setAsProfilePhoto" class="hoverableAction">{% trans %}SetAsProfilePhoto{% endtrans %}</a>
             {% endif %}
         </div>
     </div>

@@ -313,12 +313,21 @@ class ApiUserManagement(session.BaseSessionHandler):
         elif option == "blockAccount":
             # Only admin is allowed to block account
             if current_session.get_role_level() < 3:
-                data = '{"error": "You cannot change your permission level."}'
+                data = '{"error": "You cannot change your block status."}'
                 result = "FAIL"
                 self.response.write(template.render(feature="user",
                                                 data=data,
                                                 query=self.request.url,
                                                 result=result))
+                return None
+            # No anyone is allowed to block an admin
+            if user.role_level == 3:
+                data = '{"error": "You cannot block an admin account."}'
+                result = "FAIL"
+                self.response.write(template.render(feature="user",
+                                                    data=data,
+                                                    query=self.request.url,
+                                                    result=result))
                 return None
             database.UserManager.modify_user(user.key, attempts=3)  # Account is blocked with 3 attempts
             data = '{"message": "Account blocked by admin."}'

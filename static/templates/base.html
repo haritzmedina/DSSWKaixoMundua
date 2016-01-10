@@ -29,45 +29,53 @@
 <div id="menu">
     <!-- Always show -->
     <a href="/">
-        <div id="indexTab" class="tab" data-active="{% block welcomeActive %}{% endblock %}">{% trans %}
-            Index{% endtrans %}</div>
+        <div id="indexTab" class="tab" data-active="{% block welcomeActive %}{% endblock %}">
+            {% trans %}Index{% endtrans %}
+        </div>
     </a>
     <a href="/photos">
-        <div id="photosTab" class="tab" data-active="{% block photosActive %}{% endblock %}">{% trans %}
-            Photos{% endtrans %}</div>
+        <div id="photosTab" class="tab" data-active="{% block photosActive %}{% endblock %}">
+            {% trans %}Photos{% endtrans %}
+        </div>
     </a>
     <a href="/map">
-        <div id="mapTab" class="tab" data-active="{% block mapActive %}{% endblock %}">{% trans %}
-            Map{% endtrans %}</div>
+        <div id="mapTab" class="tab" data-active="{% block mapActive %}{% endblock %}">
+            {% trans %}Map{% endtrans %}
+        </div>
     </a>
     <!-- Show if user is not logged in -->
     {% if session.get_id()==None %}
         <a href="/login">
-            <div id="loginTab" class="tab" data-active="{% block loginActive %}{% endblock %}">{% trans %}
-                Login{% endtrans %}</div>
+            <div id="loginTab" class="tab" data-active="{% block loginActive %}{% endblock %}">
+                {% trans %}Login{% endtrans %}
+            </div>
         </a>
         <a href="/register">
-            <div id="registerTab" class="tab" data-active="{% block registerActive %}{% endblock %}">{% trans %}
-                Register{% endtrans %}</div>
+            <div id="registerTab" class="tab" data-active="{% block registerActive %}{% endblock %}">
+                {% trans %}Register{% endtrans %}
+            </div>
         </a>
         <!-- Show if user is logged in -->
     {% else %}
         {% if session.get_role_level() >= 1 %}
             <a href="/profile/{{ session.get_id() }}">
-                <div id="profileTab" class="tab" data-active="{% block profileActive %}{% endblock %}">{% trans %}
-                    Profile{% endtrans %}</div>
+                <div id="profileTab" class="tab" data-active="{% block profileActive %}{% endblock %}">
+                    {% trans %}Profile{% endtrans %}
+                </div>
             </a>
         {% endif %}
         {% if session.get_role_level() == 3 %}
             <!-- Show if user is admin -->
             <a href="/users">
-                <div id="showUsersTab" class="tab" data-active="{% block usersActive %}{% endblock %}">{% trans %}
-                    Users{% endtrans %}</div>
+                <div id="showUsersTab" class="tab" data-active="{% block usersActive %}{% endblock %}">
+                    {% trans %}Users{% endtrans %}
+                </div>
             </a>
         {% endif %}
         <a href="/logout">
-            <div id="logoutTab" class="tab" data-active="{% block logoutActive %}{% endblock %}">{% trans %}
-                Logout{% endtrans %}</div>
+            <div id="logoutTab" class="tab" data-active="{% block logoutActive %}{% endblock %}">
+                {% trans %}Logout{% endtrans %}
+            </div>
         </a>
     {% endif %}
 </div>
