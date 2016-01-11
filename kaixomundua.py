@@ -476,8 +476,16 @@ class PhotoManagePage(session.BaseSessionHandler):
         # Load jinja template
         template = JINJA_ENVIRONMENT.get_template('static/templates/photo.html')
 
-        # Get photo info to display
+        # Check permission
         photo = database.PhotosManager.get_photo_by_id(int(photo_id))
+        if current_session.get_id() is None:
+            request_user = None
+        else:
+            request_user = database.UserManager.select_by_id(current_session.get_id())
+        if not security.PhotoSecurity.user_is_allowed_to_watch_photo(photo, request_user):
+            self.redirect("/")
+
+        # Get photo info to display
         user = photo.owner.get()
         privacy = photo.privacy
         date = photo.date
@@ -489,8 +497,6 @@ class PhotoManagePage(session.BaseSessionHandler):
             allowed_users = database.PhotoUserPermissionManager.get_allowed_users_by_photo(photo)
         else:
             allowed_users = None
-
-
 
         # Count photo visited by user
         if current_session.get_id() is None:

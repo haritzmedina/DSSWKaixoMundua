@@ -142,7 +142,10 @@ class ApiPhotoDownload(session.BlobDownloadSessionHandler):
 
         # Retrieve photo url for photo_id
         photo = database.PhotosManager.get_photo_by_id(int(photo_id))
-        user = database.UserManager.select_by_id(current_session.get_id())
+        if current_session.get_id() is None:
+            user = None
+        else:
+            user = database.UserManager.select_by_id(current_session.get_id())
 
         if not photo:
             self.response.write("No photo")
@@ -386,7 +389,10 @@ class ApiPhotosManager(session.BaseSessionHandler):
         if option == "list":
             # List all accesible photos
             photos = database.PhotosManager.retrieveAllPhotos()
-            user = database.UserManager.select_by_id(current_session.get_id())
+            if current_session.get_id() is None:
+                user = None
+            else:
+                user = database.UserManager.select_by_id(current_session.get_id())
             data = '{"photos":['
             isAnyPhotoAllowed = False
             for photo in photos:
